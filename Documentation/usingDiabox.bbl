@@ -1,0 +1,75 @@
+\begin{thebibliography}{14}
+\providecommand{\natexlab}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem[{\textit{Ganachaud}(2002)}]{Ganachaud:2002ec}
+Ganachaud, A. (2002), {Oceanic nutrient and oxygen transports and bounds on
+  export production during the World Ocean Circulation Experiment},
+  \textit{Global Biogeochemical Cycles}, \textit{16}(4), 1057.
+
+\bibitem[{\textit{Ganachaud}(2003)}]{ganachaud03b}
+Ganachaud, A. (2003), Error budget of inverse box models: The north atlantic,
+  \textit{Journal of Atmospheric and Oceanic Technology}, \textit{20}(11),
+  1641--1655.
+
+\bibitem[{\textit{Ganachaud and Wunsch}(2000)}]{Ganachaud:2000uo}
+Ganachaud, A., and C.~Wunsch (2000), {Improved estimates of global ocean
+  circulation, heat transport and mixing from hydrographic data},
+  \textit{Nature}, \textit{408}(6811), 453--457.
+
+\bibitem[{\textit{Jackett and McDougall}(1997)}]{Jackett:1997p370}
+Jackett, D., and T.~McDougall (1997), {A neutral density variable for the
+  world's oceans}, \textit{J. Phys. Oceanogr.}, \textit{27}(2), 237--263.
+
+\bibitem[{\textit{Jullion et~al.}(2010)\textit{Jullion, Heywood,
+  Naveira-Garabato, and Stevens}}]{Jullion:2010ew}
+Jullion, L., K.~J. Heywood, A.~C.~N. Naveira-Garabato, and D.~P. Stevens
+  (2010), {Circulation and Water Mass Modification in the Brazil--Malvinas
+  Confluence}, \textit{J. of Phy. Oceano.}, \textit{40}(5), 845--864.
+
+\bibitem[{\textit{Jullion et~al.}(2013)}]{Jullion:2013}
+Jullion, L., et~al. (2013), {The contribution of the Weddell Sea to the lower
+  limb of the Meridional Overturning Circulation.}, \textit{J. of Mar. Res.},
+  p. In prep.
+
+\bibitem[{\textit{Lumpkin and Speer}(2007)}]{Lumpkin:2007tn}
+Lumpkin, R., and K.~G. Speer (2007), {Global ocean meridional overturning},
+  \textit{J. of Phy. Oceano.}, \textit{37}(10), 2550--2562.
+
+\bibitem[{\textit{Macdonald}(1998)}]{Macdonald:1998vy}
+Macdonald, A. (1998), {The global ocean circulation: A hydrographic estimate
+  and regional analysis}, \textit{Progress in Oceanography}, \textit{41}(3),
+  281--382.
+
+\bibitem[{\textit{McIntosh and Rintoul}(1997)}]{mcintoshandrintoul97}
+McIntosh, P.~C., and S.~R. Rintoul (1997), {Do box inverse models work?},
+  \textit{J. of Phy. Oceano.}, \textit{27}, 291--308.
+
+\bibitem[{\textit{Morgan}(1994)}]{Morgan94}
+Morgan, P.~P. (1994), Box inverse modelling with dobox 4.2, \textit{Tech. Rep.
+  225}, CSIRO Marine Laboratories Repor.
+
+\bibitem[{\textit{Sloyan and Rintoul}(2000)}]{sloyan00}
+Sloyan, B.~M., and S.~R. Rintoul (2000), {Estimates of area-averaged diapycnal
+  fluxes from basin-scale budgets}, \textit{J. Phys. Oceanogr.}, \textit{30},
+  2320--2349.
+
+\bibitem[{\textit{Talley et~al.}(2003)\textit{Talley, Reid, and
+  Robbins}}]{Talleyetal:2003}
+Talley, L.~D., J.~L. Reid, and P.~E. Robbins (2003), {Data-based meridional
+  overturning streamfunctions for the global ocean.}, \textit{J. Climate},
+  \textit{16}, 3213--3226.
+
+\bibitem[{\textit{Torres-Vald{\'e}s et~al.}(2013)}]{TorresValdes:2013fw}
+Torres-Vald{\'e}s, S., et~al. (2013), {Export of nutrients from the Arctic
+  Ocean}, \textit{Journal of Geophysical Research. C. Oceans}, \textit{118}(4),
+  1625--1644.
+
+\bibitem[{\textit{Wunsch}(1996)}]{wunsch96}
+Wunsch, C. (1996), \textit{{The Ocean inverse circulation inverse problem}},
+  442 pp pp., Cambridge University Press.
+
+\end{thebibliography}

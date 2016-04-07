@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2012)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: usingDiabox.aux
+The style file: ../../../templates_journals/AGU/agu08.bst
+Database file #1: diaboxbib.bib
+Warning--I didn't find a database entry for "Gouretski2004"
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 14 entries,
+            3145 wiz_defined-function locations,
+            1169 strings with 11909 characters,
+and the built_in function-call counts, 13259 in all, are:
+= -- 1613
+> -- 305
+< -- 12
++ -- 196
+- -- 76
+* -- 706
+:= -- 1167
+add.period$ -- 14
+call.type$ -- 14
+change.case$ -- 60
+chr.to.int$ -- 15
+cite$ -- 14
+duplicate$ -- 1488
+empty$ -- 759
+format.name$ -- 117
+if$ -- 2690
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 121
+newline$ -- 49
+num.names$ -- 56
+pop$ -- 525
+preamble$ -- 1
+purify$ -- 47
+quote$ -- 0
+skip$ -- 921
+stack$ -- 0
+substring$ -- 630
+swap$ -- 1301
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 123
+warning$ -- 0
+while$ -- 75
+width$ -- 0
+write$ -- 160
+(There was 1 warning)

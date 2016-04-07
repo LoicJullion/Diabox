@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Objective}{3}
+\contentsline {section}{\numberline {2}Theory of box inverse modelling}{3}
+\contentsline {subsection}{\numberline {a.\itshape }Conservation and geostrophy}{3}
+\contentsline {subsection}{\numberline {b.\itshape }Additional terms}{5}
+\contentsline {subsection}{\numberline {c.\itshape }Solving the system}{6}
+\contentsline {section}{\numberline {3}Setting up DIABOX}{6}
+\contentsline {subsection}{\numberline {a.\itshape }Installing DIABOX}{7}
+\contentsline {subsection}{\numberline {b.\itshape }Pre-inversion processing}{7}
+\contentsline {subsubsection}{\numberline {i.\itshape }Preparing the section files for use in DIABOX}{7}
+\contentsline {subsection}{\numberline {c.\itshape }Identifying the box geometry}{7}
+\contentsline {section}{\numberline {4}Inverse model construction using DIABOX}{9}
+\contentsline {subsection}{\numberline {a.\itshape }Formatting the variables in DIABOX format}{9}
+\contentsline {subsection}{\numberline {b.\itshape }Creating the geometry file}{10}
+\contentsline {subsubsection}{\numberline {i.\itshape }Constructing the geometry matrix}{10}
+\contentsline {subsubsection}{\numberline {ii.\itshape }Checking the geometry matrix}{12}
+\contentsline {subsection}{\numberline {c.\itshape }Creating polygons defining the boxes (\textit {makeboxcoords.m})}{13}
+\contentsline {subsection}{\numberline {d.\itshape }Creating section-specific constraints (\textit {addxconstraints.m})}{14}
+\contentsline {subsection}{\numberline {e.\itshape }Calculate mean properties (\textit {makemprop.m})}{15}
+\contentsline {subsection}{\numberline {f.\itshape }Calculate air-sea fluxes on outcropping layers (\textit {makeairsea.m})}{15}
+\contentsline {subsection}{\numberline {g.\itshape }Creating the \textit {a priori} reference velocities (refvels.m)}{17}
+\contentsline {section}{\numberline {5}Setting up the matrices and inverting}{21}
+\contentsline {subsection}{\numberline {a.\itshape }Constructing the matrices}{21}
+\contentsline {subsection}{\numberline {b.\itshape }The master routine \textit {gauss.m}}{22}
+\contentsline {subsubsection}{\numberline {i.\itshape }defindices}{22}
+\contentsline {subsubsection}{\numberline {ii.\itshape }getXcol}{23}
+\contentsline {section}{\numberline {6}Plotting and interpreting results}{23}
