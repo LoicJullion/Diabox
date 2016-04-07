@@ -1,0 +1,9 @@
+
+load glevels.mat ; % glevels = layer interfaces
+glayers=[glevels(1)-.5*(glevels(2)-glevels(1)); ...
+        glevels(1:length(glevels)-1)+diff(glevels)/2; ...
+        last(glevels)+last(diff(glevels))/2];
+layers=(1:length(glayers))';
+gamma2=[glevels(1)-diff(glevels(1:2)); ...
+        glevels;last(glevels)+last(diff(glevels))];
+

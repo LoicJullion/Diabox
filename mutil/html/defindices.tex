@@ -1,0 +1,187 @@
+
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and republish this document.
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{color}
+
+\sloppy
+\definecolor{lightgray}{gray}{0.5}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+    
+    
+\subsection*{Contents}
+
+\begin{itemize}
+\setlength{\itemsep}{-1ex}
+   \item 1) create indices for unknowns
+   \item 2) Create indices for property fluxes \%
+   \item 3) Mean area and properties for each isopycnal level
+\end{itemize}
+\begin{verbatim}
+function [indv,indw,indF,indE,indb,meanprop,level_area] = defindices(A,nAbase,nA,nboxes,nproperties,nlayers,nsections)
+\end{verbatim}
+\begin{verbatim}
+%==========================================================================
+% defindices.m
+%
+% Identify the components of A, x and b in DIABOX format, using the data
+% structure pointers (see the original DOBOX manual, pg. 24).
+%   We define:
+%   indv = (column) indices for ref. velocity
+%   indw = (column) indices for w.
+%   indF = Indices for air-sea forcing corrections (tacked on after w* terms)
+%   indE = Indices for Ekman transport corrections
+%
+%   indb = (row) indices for property fluxes.
+%
+%   meanprop(i,j,k) is the mean value of property j at level i, in box k
+%
+% Example:
+% x(indv(i)) reference velocity at stn. pair i
+% x(indw(i,j,k)) equivalent diapycnal velocity at level i of property j, box k.
+% b(indb(i,j,k)) layer i flux of property j, box k.(i=nlayers+1 for vertical integral)
+%
+% AUTHORS: Rick Lumpkin.
+%
+% MODIFIED: Loic Jullion (Transformed in a function and commented).
+%
+%-----------------
+% Licence:
+% This file is licensed under the Creative Commons Attribution-Share
+% Alike 4.0 International license.
+%
+%     You are free:
+%
+%         to share ? to copy, distribute and transmit the work
+%         to remix ? to adapt the work
+%
+%     Under the following conditions:
+%
+%         attribution ? You must attribute the work in the manner specified
+%                       by the author or licensor (but not in any way that
+%                       suggests that they endorse you or your use of the
+%                       work).
+%         share alike ? If you alter, transform, or build upon this work,
+%                       you may distribute the resulting work only under
+%                       the same or similar license to this one.
+%-----------------
+%
+%==========================================================================
+\end{verbatim}
+
+
+\subsection*{1) create indices for unknowns}
+
+\begin{verbatim}
+% (column) indices for ref. velocity
+indv=(1:nAbase)';
+% (column) indices for w.
+for k=1:nboxes;
+  for j=1:nproperties;
+      jj = (k-1)*nproperties+j;
+      indw(:,j,k ) =( nAbase+1+(jj-1)*(nlayers-1):nAbase+jj*(nlayers-1) )';
+  end;
+end;
+
+% indices for air-sea forcing corrections (tacked on after w* terms):
+% corrections are for heat and freshwater flux only; corresponding density
+% flux corrections are directly calculated from F*,h and F*,fw,
+% x(indF(:,1,:)) : correction to H flux
+% x(indF(:,2,:)) : correction to FW flux
+% NOTE: these terms are defined on the glevels grid, not on glayers.
+indF=NaN*ones(nlayers-1,2,nboxes);
+ct=1;
+for k=1:nboxes;
+  for j=1:2;
+    for i=1:nlayers-1;
+      indF(i,j,k)=max(max(max(indw)))+ct;
+      ct=ct+1;
+    end;
+  end;
+end;
+
+% indices for Ekman transport corrections (one multiplicative factor for
+% the net Ekman transport across each section, applied to all layers and
+% all properties)
+indE=NaN*ones(nsections,1);
+ct=1;
+for k=1:nsections;
+  indE(k)=max(max(max(indF)))+ct;
+  ct=ct+1;
+end;
+
+% done creating indices for unknowns.
+\end{verbatim}
+
+        \color{lightgray} \begin{verbatim}Error using defindices (line 51)
+Not enough input arguments.
+\end{verbatim} \color{black}
+    
+
+\subsection*{2) Create indices for property fluxes \%}
+
+\begin{verbatim}
+% (row) indices for property fluxes;
+% indb(1:nlayers,j,k) are the layer fluxes of property j in box k;
+% indb(nlayers+1,j,k) is the vertically-integrated flux of property j in box k.
+indb = NaN*ones(nlayers+1,nproperties,nboxes);
+for k=1:nboxes;
+  for j=1:nproperties;
+      jj=(k-1)*nproperties+j;
+      indb(:,j,k)=( 1+(jj-1)*(nlayers+1): jj*(nlayers+1) )';
+  end;
+end;
+
+% done creating property flux indices
+\end{verbatim}
+
+
+\subsection*{3) Mean area and properties for each isopycnal level}
+
+
+\begin{verbatim}if diapycnal velocities are included Extract mean level areas and
+properties from A. meanprop(i,j,k) is the mean value of property j
+at level i, in box k.  For j=1, this is the level's area.
+(Note: this could alternatively be done by loading
+the values from the mprop_atl*.mat files.)\end{verbatim}
+    \begin{verbatim}
+if (nA>nAbase)
+
+  meanprop=NaN*ones(nlayers-1,nproperties,nboxes);
+  for k=1:nboxes;
+    for j=1:nproperties;
+      meanprop(:,j,k)=diag(A(indb(1:nlayers,j,k),indw(:,j,k)));
+    end;
+  end;
+
+  % define level_area, the area of the layers
+  level_area=meanprop(:,1,:);
+  level_area=reshape(level_area,[nlayers-1,nboxes]);
+  q=find(level_area==0);
+  level_area(q)=NaN;
+
+  % divide by level area to get mean property
+  % values (ones for volume, salinity anomaly in
+  % psu, temperature in degC., etc.)
+  for k=1:nboxes
+    for j=1:nproperties
+      meanprop(:,j,k)=meanprop(:,j,k)./level_area(:,k);
+    end;
+  end;
+
+  q=find(meanprop==0);
+  meanprop(q)=NaN;
+
+end;
+return
+\end{verbatim}
+
+
+
+\end{document}
+    

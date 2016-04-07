@@ -1,0 +1,344 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>defindices</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-18"><meta name="DC.source" content="defindices.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">1) create indices for unknowns</a></li><li><a href="#4">2) Create indices for property fluxes %</a></li><li><a href="#5">3) Mean area and properties for each isopycnal level</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [indv,indw,indF,indE,indb,meanprop,level_area] = defindices(A,nAbase,nA,nboxes,nproperties,nlayers,nsections)
+</pre><pre class="codeinput"><span class="comment">%==========================================================================</span>
+<span class="comment">% defindices.m</span>
+<span class="comment">%</span>
+<span class="comment">% Identify the components of A, x and b in DIABOX format, using the data</span>
+<span class="comment">% structure pointers (see the original DOBOX manual, pg. 24).</span>
+<span class="comment">%   We define:</span>
+<span class="comment">%   indv = (column) indices for ref. velocity</span>
+<span class="comment">%   indw = (column) indices for w.</span>
+<span class="comment">%   indF = Indices for air-sea forcing corrections (tacked on after w* terms)</span>
+<span class="comment">%   indE = Indices for Ekman transport corrections</span>
+<span class="comment">%</span>
+<span class="comment">%   indb = (row) indices for property fluxes.</span>
+<span class="comment">%</span>
+<span class="comment">%   meanprop(i,j,k) is the mean value of property j at level i, in box k</span>
+<span class="comment">%</span>
+<span class="comment">% Example:</span>
+<span class="comment">% x(indv(i)) reference velocity at stn. pair i</span>
+<span class="comment">% x(indw(i,j,k)) equivalent diapycnal velocity at level i of property j, box k.</span>
+<span class="comment">% b(indb(i,j,k)) layer i flux of property j, box k.(i=nlayers+1 for vertical integral)</span>
+<span class="comment">%</span>
+<span class="comment">% AUTHORS: Rick Lumpkin.</span>
+<span class="comment">%</span>
+<span class="comment">% MODIFIED: Loic Jullion (Transformed in a function and commented).</span>
+<span class="comment">%</span>
+<span class="comment">%-----------------</span>
+<span class="comment">% Licence:</span>
+<span class="comment">% This file is licensed under the Creative Commons Attribution-Share</span>
+<span class="comment">% Alike 4.0 International license.</span>
+<span class="comment">%</span>
+<span class="comment">%     You are free:</span>
+<span class="comment">%</span>
+<span class="comment">%         to share ? to copy, distribute and transmit the work</span>
+<span class="comment">%         to remix ? to adapt the work</span>
+<span class="comment">%</span>
+<span class="comment">%     Under the following conditions:</span>
+<span class="comment">%</span>
+<span class="comment">%         attribution ? You must attribute the work in the manner specified</span>
+<span class="comment">%                       by the author or licensor (but not in any way that</span>
+<span class="comment">%                       suggests that they endorse you or your use of the</span>
+<span class="comment">%                       work).</span>
+<span class="comment">%         share alike ? If you alter, transform, or build upon this work,</span>
+<span class="comment">%                       you may distribute the resulting work only under</span>
+<span class="comment">%                       the same or similar license to this one.</span>
+<span class="comment">%-----------------</span>
+<span class="comment">%</span>
+<span class="comment">%==========================================================================</span>
+</pre><h2>1) create indices for unknowns<a name="3"></a></h2><pre class="codeinput"><span class="comment">% (column) indices for ref. velocity</span>
+indv=(1:nAbase)';
+<span class="comment">% (column) indices for w.</span>
+<span class="keyword">for</span> k=1:nboxes;
+  <span class="keyword">for</span> j=1:nproperties;
+      jj = (k-1)*nproperties+j;
+      indw(:,j,k ) =( nAbase+1+(jj-1)*(nlayers-1):nAbase+jj*(nlayers-1) )';
+  <span class="keyword">end</span>;
+<span class="keyword">end</span>;
+
+<span class="comment">% indices for air-sea forcing corrections (tacked on after w* terms):</span>
+<span class="comment">% corrections are for heat and freshwater flux only; corresponding density</span>
+<span class="comment">% flux corrections are directly calculated from F*,h and F*,fw,</span>
+<span class="comment">% x(indF(:,1,:)) : correction to H flux</span>
+<span class="comment">% x(indF(:,2,:)) : correction to FW flux</span>
+<span class="comment">% NOTE: these terms are defined on the glevels grid, not on glayers.</span>
+indF=NaN*ones(nlayers-1,2,nboxes);
+ct=1;
+<span class="keyword">for</span> k=1:nboxes;
+  <span class="keyword">for</span> j=1:2;
+    <span class="keyword">for</span> i=1:nlayers-1;
+      indF(i,j,k)=max(max(max(indw)))+ct;
+      ct=ct+1;
+    <span class="keyword">end</span>;
+  <span class="keyword">end</span>;
+<span class="keyword">end</span>;
+
+<span class="comment">% indices for Ekman transport corrections (one multiplicative factor for</span>
+<span class="comment">% the net Ekman transport across each section, applied to all layers and</span>
+<span class="comment">% all properties)</span>
+indE=NaN*ones(nsections,1);
+ct=1;
+<span class="keyword">for</span> k=1:nsections;
+  indE(k)=max(max(max(indF)))+ct;
+  ct=ct+1;
+<span class="keyword">end</span>;
+
+<span class="comment">% done creating indices for unknowns.</span>
+</pre><pre class="codeoutput error">Error using defindices (line 51)
+Not enough input arguments.
+</pre><h2>2) Create indices for property fluxes %<a name="4"></a></h2><pre class="codeinput"><span class="comment">% (row) indices for property fluxes;</span>
+<span class="comment">% indb(1:nlayers,j,k) are the layer fluxes of property j in box k;</span>
+<span class="comment">% indb(nlayers+1,j,k) is the vertically-integrated flux of property j in box k.</span>
+indb = NaN*ones(nlayers+1,nproperties,nboxes);
+<span class="keyword">for</span> k=1:nboxes;
+  <span class="keyword">for</span> j=1:nproperties;
+      jj=(k-1)*nproperties+j;
+      indb(:,j,k)=( 1+(jj-1)*(nlayers+1): jj*(nlayers+1) )';
+  <span class="keyword">end</span>;
+<span class="keyword">end</span>;
+
+<span class="comment">% done creating property flux indices</span>
+</pre><h2>3) Mean area and properties for each isopycnal level<a name="5"></a></h2><pre>if diapycnal velocities are included Extract mean level areas and
+properties from A. meanprop(i,j,k) is the mean value of property j
+at level i, in box k.  For j=1, this is the level's area.
+(Note: this could alternatively be done by loading
+the values from the mprop_atl*.mat files.)</pre><pre class="codeinput"><span class="keyword">if</span> (nA&gt;nAbase)
+
+  meanprop=NaN*ones(nlayers-1,nproperties,nboxes);
+  <span class="keyword">for</span> k=1:nboxes;
+    <span class="keyword">for</span> j=1:nproperties;
+      meanprop(:,j,k)=diag(A(indb(1:nlayers,j,k),indw(:,j,k)));
+    <span class="keyword">end</span>;
+  <span class="keyword">end</span>;
+
+  <span class="comment">% define level_area, the area of the layers</span>
+  level_area=meanprop(:,1,:);
+  level_area=reshape(level_area,[nlayers-1,nboxes]);
+  q=find(level_area==0);
+  level_area(q)=NaN;
+
+  <span class="comment">% divide by level area to get mean property</span>
+  <span class="comment">% values (ones for volume, salinity anomaly in</span>
+  <span class="comment">% psu, temperature in degC., etc.)</span>
+  <span class="keyword">for</span> k=1:nboxes
+    <span class="keyword">for</span> j=1:nproperties
+      meanprop(:,j,k)=meanprop(:,j,k)./level_area(:,k);
+    <span class="keyword">end</span>;
+  <span class="keyword">end</span>;
+
+  q=find(meanprop==0);
+  meanprop(q)=NaN;
+
+<span class="keyword">end</span>;
+<span class="keyword">return</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [indv,indw,indF,indE,indb,meanprop,level_area] = defindices(A,nAbase,nA,nboxes,nproperties,nlayers,nsections)
+%==========================================================================
+% defindices.m
+%
+% Identify the components of A, x and b in DIABOX format, using the data 
+% structure pointers (see the original DOBOX manual, pg. 24).
+%   We define:
+%   indv = (column) indices for ref. velocity
+%   indw = (column) indices for w.
+%   indF = Indices for air-sea forcing corrections (tacked on after w* terms)
+%   indE = Indices for Ekman transport corrections
+%
+%   indb = (row) indices for property fluxes.
+%
+%   meanprop(i,j,k) is the mean value of property j at level i, in box k
+%
+% Example:
+% x(indv(i)) reference velocity at stn. pair i
+% x(indw(i,j,k)) equivalent diapycnal velocity at level i of property j, box k.
+% b(indb(i,j,k)) layer i flux of property j, box k.(i=nlayers+1 for vertical integral)
+%
+% AUTHORS: Rick Lumpkin.
+%
+% MODIFIED: Loic Jullion (Transformed in a function and commented).
+%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Licence:
+% This file is licensed under the Creative Commons Attribution-Share 
+% Alike 4.0 International license. 	
+%
+%     You are free:
+% 
+%         to share ? to copy, distribute and transmit the work
+%         to remix ? to adapt the work
+% 
+%     Under the following conditions:
+% 
+%         attribution ? You must attribute the work in the manner specified 
+%                       by the author or licensor (but not in any way that 
+%                       suggests that they endorse you or your use of the 
+%                       work).
+%         share alike ? If you alter, transform, or build upon this work, 
+%                       you may distribute the resulting work only under 
+%                       the same or similar license to this one.
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+%
+%==========================================================================
+%% 1) create indices for unknowns 
+
+% (column) indices for ref. velocity
+indv=(1:nAbase)';
+% (column) indices for w. 
+for k=1:nboxes;
+  for j=1:nproperties;
+      jj = (k-1)*nproperties+j;
+      indw(:,j,k ) =( nAbase+1+(jj-1)*(nlayers-1):nAbase+jj*(nlayers-1) )';
+  end;
+end;
+
+% indices for air-sea forcing corrections (tacked on after w* terms): 
+% corrections are for heat and freshwater flux only; corresponding density 
+% flux corrections are directly calculated from F*,h and F*,fw, 
+% x(indF(:,1,:)) : correction to H flux 
+% x(indF(:,2,:)) : correction to FW flux
+% NOTE: these terms are defined on the glevels grid, not on glayers.
+indF=NaN*ones(nlayers-1,2,nboxes);
+ct=1;
+for k=1:nboxes;
+  for j=1:2;
+    for i=1:nlayers-1;
+      indF(i,j,k)=max(max(max(indw)))+ct;
+      ct=ct+1;
+    end;
+  end;
+end;
+
+% indices for Ekman transport corrections (one multiplicative factor for 
+% the net Ekman transport across each section, applied to all layers and 
+% all properties)
+indE=NaN*ones(nsections,1);
+ct=1;
+for k=1:nsections;
+  indE(k)=max(max(max(indF)))+ct;
+  ct=ct+1;
+end;
+
+% done creating indices for unknowns. 
+
+%% 2) Create indices for property fluxes %
+
+% (row) indices for property fluxes;
+% indb(1:nlayers,j,k) are the layer fluxes of property j in box k; 
+% indb(nlayers+1,j,k) is the vertically-integrated flux of property j in box k.
+indb = NaN*ones(nlayers+1,nproperties,nboxes);
+for k=1:nboxes;
+  for j=1:nproperties;
+      jj=(k-1)*nproperties+j;
+      indb(:,j,k)=( 1+(jj-1)*(nlayers+1): jj*(nlayers+1) )';
+  end;
+end;
+
+% done creating property flux indices
+
+%% 3) Mean area and properties for each isopycnal level
+%  if diapycnal velocities are included Extract mean level areas and 
+%  properties from A. meanprop(i,j,k) is the mean value of property j
+%  at level i, in box k.  For j=1, this is the level's area.
+%  (Note: this could alternatively be done by loading
+%  the values from the mprop_atl*.mat files.)
+
+if (nA>nAbase)	
+
+  meanprop=NaN*ones(nlayers-1,nproperties,nboxes);
+  for k=1:nboxes;
+    for j=1:nproperties;
+      meanprop(:,j,k)=diag(A(indb(1:nlayers,j,k),indw(:,j,k)));
+    end;
+  end;
+
+  % define level_area, the area of the layers
+  level_area=meanprop(:,1,:);
+  level_area=reshape(level_area,[nlayers-1,nboxes]);
+  q=find(level_area==0);
+  level_area(q)=NaN;
+
+  % divide by level area to get mean property 
+  % values (ones for volume, salinity anomaly in
+  % psu, temperature in degC., etc.)
+  for k=1:nboxes
+    for j=1:nproperties
+      meanprop(:,j,k)=meanprop(:,j,k)./level_area(:,k);
+    end;
+  end;
+
+  q=find(meanprop==0);
+  meanprop(q)=NaN; 
+
+end;
+return
+
+##### SOURCE END #####
+--></body></html>
