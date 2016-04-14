@@ -31,15 +31,16 @@ function makemap(lon,lat)
 %
 %==========================================================================
 load dir_loc.mat bathy_dir;
-eval(['load ' bathy_dir 'gebco_2deg.mat']);
+eval(['load ' bathy_dir 'gebco_Med.mat']);
 
 minlon = lon(1); maxlon = lon(2);
 minlat = lat(1); maxlat = lat(2);
 
-%imagesc(LON,LAT(end:-1:1),flipud(HH))
-imagesc(lon_gebco,lat_gebco,HH_2deg)
+imagesc(LON,LAT(end:-1:1),flipud(HH))
+%imagesc(lon_gebco,lat_gebco,HH_2deg)
 hold on
-contour(lon_gebco,lat_gebco,HH_2deg,[0 0],'Color',[1 1 1],'LineWidth',1)
+%contour(lon_gebco,lat_gebco,HH_2deg,[0 0],'Color',[1 1 1],'LineWidth',1)
+contour(LON,LAT,HH,[0 0],'Color',[1 1 1],'LineWidth',1)
 axis xy
 axis([minlon maxlon minlat maxlat]); caxis([-6000 0])
  

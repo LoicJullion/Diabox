@@ -87,22 +87,29 @@ setstr(command);
 eval(command);
 
 %% Calculate the fluxes for the individual properties
+
+% Frac allows to account for bottom triangles. It is equal to one if the
+% bin is completely in the water, 0 it is not in the water or it is equal
+% to [0 - 1] if the bin is partly in the water. (example frac(i,j) = 0.6
+% means that 60% of the bin is in the water.
+[frac] = loadvars(sectfile,'frac');
+
 [nproperties,~] = size(properties);
 fbox = [];
 disp('Calculating Flux Per Depth for Properties...')
 for iprop = 1:nproperties
    PropName = [charword( properties(iprop,:) )];
    disp(['      ' PropName])
-   if iprop==1
+   if iprop==1 % for volume transport
       binPair_prop = ones(nbins,npairs);
-   else
+   else % for the other parameters
       Var          = ['binPair_' PropName];
       Expression   = ['loadvars(sectfile,Var)'];
       command      = ['binPair_prop = ' Expression ';'];
       eval(command)
    end %if
   
-   command = ['FperDepth_prop = binPair_prop .* gvel;'];
+   command = ['FperDepth_prop = binPair_prop .* gvel.*frac;'];
    eval(command)
    
    for ipair = 1:npairs
@@ -111,31 +118,31 @@ for iprop = 1:nproperties
       eval(command)
    end %for
 
+   % Now interpolate the results into density layers.
    LayerF_prop   = [];
-
    for ipair = 1:npairs
-     LayerFPair_prop   = NaN*ones(1,nlayers);
+       % for the station pair ipair, extrac the pressure at which each layer
+       % is found (calculated in prep4dobox).
+       LayerFPair_prop   = NaN*ones(1,nlayers);
   
-     good_p      = Layer_press(:,ipair); 
-     good_surf   = find(~isnan(good_p)); 
+       good_p      = Layer_press(:,ipair); 
+       good_surf   = find(~isnan(good_p)); 
   
-     if ~isempty(good_surf)
-         F_good = integrate(bin_press,FperDepth_prop(:,ipair),good_p(good_surf)); 
-       for igood = 1:length(F_good)
-         LayerFPair_prop(good_surf(igood)) = F_good(igood);
-       end %for
-     end %if
+       if ~isempty(good_surf)
+          % Now integrate the property between each layer interfaces. 
+          F_good = integrate(bin_press,FperDepth_prop(:,ipair),good_p(good_surf)); 
+          for igood = 1:length(F_good)
+              LayerFPair_prop(good_surf(igood)) = F_good(igood);
+          end %for
+       end %if
  
-     LayerF_prop   = [LayerF_prop LayerFPair_prop'];
+       LayerF_prop   = [LayerF_prop LayerFPair_prop'];
 
    end %for
-
+   % Change the NaNs to 0s
    LayerF_prop  = change(LayerF_prop, '==',NaN,0);
-
+   % Concatenate the different properties on top of each other and add a
+   % row for the full depth values (the sum of all the layers).
    fbox = [fbox; LayerF_prop; sum(LayerF_prop)];
 end %for
-%%
 return
-
-%---------------------------------------------------------------------------
-

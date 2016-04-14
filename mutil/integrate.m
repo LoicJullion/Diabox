@@ -1,4 +1,5 @@
 function yi = integrate_m1(x,y,xi,keyword)
+
 %=========================================================================
 % INTEGRATE   4.1   92/11/30   Copyright (C) Phil Morgan 1992
 %
@@ -25,32 +26,8 @@ function yi = integrate_m1(x,y,xi,keyword)
 %
 % CALLER:  general purpose
 % CALLEE:  none 
-%
+
 %  @(#)integrate.m   Revision: 4.1   92/11/30  Phil Morgan 
-%  @(#)integrate.m   Revision: 4.2   Loic Jullion 2015  Revised to update 
-%   Matlab functions. 
-%-----------------
-% Licence:
-% This file is licensed under the Creative Commons Attribution-Share 
-% Alike 4.0 International license. 	
-%
-%     You are free:
-% 
-%         to share ? to copy, distribute and transmit the work
-%         to remix ? to adapt the work
-% 
-%     Under the following conditions:
-% 
-%         attribution ? You must attribute the work in the manner specified 
-%                       by the author or licensor (but not in any way that 
-%                       suggests that they endorse you or your use of the 
-%                       work).
-%         share alike ? If you alter, transform, or build upon this work, 
-%                       you may distribute the resulting work only under 
-%                       the same or similar license to this one.
-%-----------------
-%
-%==========================================================================
 %----------------------------------------------------------------
 % SET CONSTANTS AND CHECK INPUT ARGUMENTS.  WORK WITH COL VECTORS.
 %----------------------------------------------------------------
@@ -61,11 +38,13 @@ function yi = integrate_m1(x,y,xi,keyword)
 %x = [0 2 3 4 6 7];
 %y = [10 20 10 30 20 10];
 %xi = [1 3 7];
-%%
+
 TRUE  = 1;
 FALSE = 0;
 
 View  = FALSE;
+
+%keyword = char('view')
 
 if nargin == 4
   View = strcmp(keyword,'view')
@@ -134,7 +113,9 @@ if Outrange
    error('INTEGRATE.M: xi must be in range of x ')
 end %if
 
-%% BEGIN
+%----------------------------------------------------------------
+% BEGIN
+%----------------------------------------------------------------
 [m,n]=size(x);
 
 % GET MIDPOINT x,y VALUES
@@ -157,7 +138,9 @@ if Transpose
   yi = yi';
 end %if
 
-%% DIAGNOSTIC PLOTS IF REQUIRED BY USER
+%----------------------------------------------------------------
+% DIAGNOSTIC PLOTS IF REQUIRED BY USER
+%----------------------------------------------------------------
 if View
    hold off
    clg
@@ -192,5 +175,3 @@ if View
    
 end %if
 % --------------------------------------------------------------------------
-
-

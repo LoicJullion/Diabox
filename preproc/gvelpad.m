@@ -1,4 +1,4 @@
-function [gvelp,frac,area_tri] = gvelpad(corrpress,gvel,gvel2,press,lat,lon);
+function [gvelp,frac,area_tri] = gvelpad(corrpress,gvel,gvel2,press,lat,lon)
 
 % routine to pad gvel2 down to the deepest pressure (from
 % corrdepth) for a station pair and then calculate the fraction
@@ -13,7 +13,7 @@ gvelp = gvel2;
 [pairs] = size(gvel,2);
 [area_tri] = ones(size(gvel,2));
 interval = press(2) - press(1);
-deldistkm      = distance(lat,lon,'km');
+deldistkm      = dobox_distance(lat,lon,'km');
 
 for i = 1:pairs;
 %establish which is the deepest of the station pair

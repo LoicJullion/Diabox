@@ -121,11 +121,19 @@ while box_menu_stop == 0
     % 1) First, define for each section a common value for all the stations 
     % pair 
     refvels(geometry,sectfiles,rv,vmag);
+    
     % 2) Now run "uniquerefvels.m" for sections with particular barotropic 
     %    structure in the initial guess. This file is specific to each
     %    inversion and needs to be modified accordingly.
-    uniquerefvels;
-    
+    set_uniquerefvels = 0;
+    if set_uniquerefvels == 1
+       uniquerefvels;
+    else
+       disp('No specific choices for the reference velocities have been made')
+       disp('The default reference velocities and uncertainties set in geo.m will be used')
+       disp('If specific reference velocities or uncertainties need to be set, use the uniquerefvels.m file and set set_uniquerefvels to 1')
+       s = input('Hit "enter" to continue','s');
+    end
     % Initialize the matrices containing the a apriori transport
     DL=[]; D=[]; bbase=[]; 
     [DL,D,bbase,reflevel] = rhs_menu(geometry,sectfiles,properties,DL,D,bbase,reflevel);

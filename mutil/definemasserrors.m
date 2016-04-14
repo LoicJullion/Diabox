@@ -35,7 +35,8 @@ function [masssecterror,masstotalerror]=definemasserrors(sectfiles,geometry)
 distl=NaN*ones(1,size(sectfiles,1));
 mlatt=distl;
 for ix=1:size(sectfiles,1);
-    eval(['load ',sectfiles(ix,:),' lon lat']);
+    raw_filename = charword(sectfiles(ix,:));
+    eval(['load ',raw_filename,'_raw lon lat']);
     distl(ix)=sum(sw_dist(lat,lon,'km'));
     mlatt(ix)=abs(mean(lat));
 end;

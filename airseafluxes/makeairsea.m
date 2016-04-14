@@ -103,7 +103,7 @@ fprintf('\n     BOX %d\n\n',boxnumber);
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
  % ECMWF grid: 0.5 by 0.5 deg
-sss=NaN*ones(12*length(year),172161);
+sss=NaN*ones(12*length(year),259920);
 sst=sss;netheat=sss;eminusp=sss;precip=sss;evap=sss;
 taux=sss;tauy=sss;
 

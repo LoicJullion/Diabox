@@ -91,7 +91,8 @@ for i=1:size(geometry,2);	% loop through sections
             mf     = .05*(range(Lon)+range(Lat))/2;
             theta2 = theta*2*pi/360+geometry(j,i)*pi/2;
             theta2 = theta2+.1*randn(1,1);
-            P      = quiver([mlon 0],[mlat 0],mf*[cos(theta2) 0],mf*[sin(theta2) 0],0);
+            P      = quiver([mlon 0],[mlat 0], ...
+            mf*[cos(theta2) 0],mf*[sin(theta2) 0],0);
             set(P,'color',colr(j,:),'linewidth',1);
         end
     end
@@ -104,9 +105,8 @@ for j=1:size(geometry,1);	% loop through boxes
   Lon=[];Lat=[];
   for i=1:size(geometry,2);	% accumulate lat, lon
     if (abs(geometry(j,i)));
-        raw_filename = charword(sectfiles(i,:));
-        eval(['load ',raw_filename,'_raw lon lat']);
-        Lon=[Lon,lon];Lat=[Lat,lat];
+      eval(['load ',sectfiles(i,:),' lon lat']);
+      Lon=[Lon,lon];Lat=[Lat,lat];
     end
   end
   Lon=mean(Lon);Lat=mean(Lat);
