@@ -157,25 +157,26 @@ elseif strcmp(dens_choice,'pden') % Potential density
     % This part of the code needs to be updated according to which
     % isopycnals will be used for the inversion.
     % calculate density referenced to different depths
-    sig0    = sw_dens0(bin_sal,bin_ptemp)-1000.;
-    sig500  = sw_dens(bin_sal,bin_ptemp,500)-1000.;
-    sig1000 = sw_dens(bin_sal,bin_ptemp,1000)-1000.;
-    sig1500 = sw_dens(bin_sal,bin_ptemp,1500)-1000.;
-    sig2000 = sw_dens(bin_sal,bin_ptemp,2000)-1000.;
-    sig2500 = sw_dens(bin_sal,bin_ptemp,2500)-1000.;
+    bin_temp = sw_temp(bin_sal,bin_ptemp,bin_press,0);
+    
+    sig0    = sw_dens0(bin_sal,bin_temp)-1000.;
+    sig500  = sw_pden(bin_sal,bin_temp,bin_press,500)-1000.;
+    sig1000 = sw_pden(bin_sal,bin_temp,bin_press,1000)-1000.;
+    sig1500 = sw_pden(bin_sal,bin_temp,bin_press,1500)-1000.;
+    sig2000 = sw_pden(bin_sal,bin_temp,bin_press,2000)-1000.;
+    sig2500 = sw_pden(bin_sal,bin_temp,bin_press,2500)-1000.;
 
     disp('Calculating pressure of potential density surfaces');
     
-    layer_s0  = [ 28.60, 29.00 ];
+    layer_s0  = [ 28.9 29.06 29.11 ];
     layer_s500 = [  ];
-    layer_s1000 = [ 33.465];
+    layer_s1000 = [];
     layer_s1500 = [  ];
     layer_s2000 = [ ];
     layer_s2500 = [ ];
     
-    glevels = [layer_s0';layer_s500';layer_s1000';layer_s1500';...
-                layer_s2000';layer_s2500'];
-    gtype   = [0;0;1000]; % Type of potential density used. 0 = referenced 
+    glevels = [layer_s0'];
+    gtype   = [0;0;0]; % Type of potential density used. 0 = referenced 
                           % to the surface. 1000 = referenced to 1000m
                         
     save glevels.mat glevels gtype;
@@ -218,8 +219,7 @@ elseif strcmp(dens_choice,'pden') % Potential density
     end
 
     % summarize the layer_press.
-    surf_press = [surf_prs0;surf_prs500;surf_prs1000;surf_prs1500;...
-                    surf_prs2000;surf_prs2500];
+    surf_press = [surf_prs0];
 
 else
     error('Please choose the correct density choice (''gamma'' or ''pden'')');
@@ -282,7 +282,8 @@ binPair_vel = gvelp;
 bin_sal     = salp;
 bin_potmp   = ptempp;
 
-% Salinity anomaly
+% Salinity anomaly  (!!!This can be changed but it also has to be changed
+% in prepctd.m!!!)
 bin_salam = (bin_sal - 35)*1e-3;
 
 % calculate 2D field of layer numbers
