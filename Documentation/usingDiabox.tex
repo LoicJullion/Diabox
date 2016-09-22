@@ -207,13 +207,20 @@ This will create a directory \verb"test_inversion/" and the corresponding sub-di
 
  		\subsubsection{Preparing the section files for use in DIABOX}
 
-The hydrographic sections need to be converted into Matlab format first. The hydrographic sections are formatted using  \verb"prepctd.m". This program performs several tasks:
+The hydrographic sections need to be converted into Matlab format first. The hydrographic sections are formatted using  \verb"prepctd.m". In the directory that was created for the inversion, run:
+\begin{tabular}{l}
+\verb">>prepctd('filedir','section_name','ctdtemp','ctdsal','ctdpres','bin_press','lat','lon','dens_choice');"\\
+\end{tabular}
+ 
+This program performs several tasks:
 \begin{enumerate}
-  \item Test to see that a temperature and salinity values exist at every 2db data point within a cast. If not it interpolates to find these values.
-  \item Calculates geostrophic velocity between stations to  deepest common depth.
-  \item Adds the geostrophic velocity to area beneath deepest common depth using (v=const. ie. dvdz=0). Calculates the area of the bottom triangle. 
-  \item Find temperature and salinity values at standard depths. In the upper 500 db this is the actual value property value at the standard depth. Below this it is a 20 db mean centred around standard depth.
-  \item Calculates the $\gamma_{n}$ values for the section, using the 2db data. Then finds the temperature, salinity and pressure value for chosen neutral surfaces. The mean pressure between these stations of neutral surfaces is then calculated.  
+  \item Check consistency of the input data
+  \item Calculate the area of the bottom triangles
+  \item Calculate the pressure of the isopycnal surfaces chosen. So far, only two choices: Neutral density and potential density. This part of the code needs to be updated according to the user's choice of isopycnal surfaces.
+  \item Calculates geostrophic velocity referenced to the surface between  stations to deepest common depth.
+  \item Adds the geostrophic velocity to area beneath deepest common depth. 
+  \item Extrapolate temperature and salinity down into the bottom triangle
+  \item Calculate salinity anomalies
 \end{enumerate}
 
 The results of the pre-processing will be stored in 3 variables, for example in the case of A08: \verb"a08_raw.mat", \verb"a08_ns.mat" and \verb"a08_tria.mat" in the subdirectory:
@@ -238,7 +245,7 @@ We start with a simple 2 box model of the North Atlantic built using 5 sections 
 \section{Inverse model construction using DIABOX}
 	\subsection{Formatting the variables in DIABOX format}
 	
-	At this point, you should know which hydrographic sections and continents will define your closed boxes. You have prepared the sections using \verb"prepctd.m". The sections are run through the step 1 of DIABOX (\verb"dosection.m"). During this step, the CTD sections (2db grid) are used to calculate the variables necessary to construct the inverse model. Inverse models are usually isopycnic models: The fluxes are calculated in density layers and the different variables need to be mapped in density space. We use neutral density \cite{Jackett:1997p370} as our vertical coordinate and a layer of the model is defined by two neutral density contours. \textbf{Note that for now, neutral density is the only density variable allowed by Diabox. This makes it problematic for regions where neutral density is not defined like the Arctic or the Mediterranean Sea}.The code asks you the name of the section you want to process. Diabox is set up so that it will look for the sections in the \verb"test_inversion/section/" subdirectory. Just enter the name of the section:
+	At this point, you should know which hydrographic sections and continents will define your closed boxes. You have prepared the sections using \verb"prepctd.m". The sections are run through the step 1 of DIABOX (\verb"dosection.m"). During this step, the CTD sections (2db grid) are used to calculate the variables necessary to construct the inverse model. Inverse models are usually isopycnic models: The fluxes are calculated in density layers and the different variables need to be mapped in density space. We use neutral density \cite{Jackett:1997p370} or potential density as our vertical coordinate and a layer of the model is defined by two neutral density contours.The code asks you the name of the section you want to process. Diabox is set up so that it will look for the sections in the \verb"test_inversion/section/" subdirectory. Just enter the name of the section:
 	
 \begin{tabular}{l}
  \verb""\\
@@ -351,6 +358,8 @@ In the example Fig.\ref{fig1}, bounding sections for the North Atlantic subtropi
 
 The direction of the arrow tells you if you’ve entered the correct sign for that section’s entry in geometry.  It should \textbf{point into the box}, as in Fig.\ref{fig1}.  For example, in Fig. \ref{fig1} the two sections bounding box 1 each have a magenta arrow which points into the Subtropical Box… All is well!
 
+Note that the in the script, the bathymetry is a 2*2deg version of Gebco that works well for large oceanic boxes but need to be updated if one wants more precise bathymetry (the file to be updated is makemap.m).
+
 	\subsection{Creating polygons defining the boxes (\textit{makeboxcoords.m})}
 
 In the following steps, we will add air-sea fluxes and river runoff to the inversion. We need to know the area of the box and which rivers we need to include. To this effect, box coordinate files, one for each box, must be created using \verb"makeboxcoords.m".  
@@ -427,7 +436,7 @@ Once all the parameters have been set, \verb"addcon.m" creates the extra constra
  
 Diapycnal fluxes of mass, heat and salt (other tracers too) require a knowledge of the mean tracer value on the isopycnal through which the fluxes occur as well as an estimation of the area of the isopycnal in the box (Eq. \ref{conservation_2}). Therefore, we need to use a climatology in order to obtain a knowledge of the vertical structure of the temperature and salinity field in the box and calculate the correct area, temperature and salinity of the isopycnals used in the box. \verb"makemprop.m" does this calculation.
 
-We use a climatology. For now, only the WOCE Global Hydrography Climatology (WGHC, \cite{Gouretski2004}). This is a relatively old climatology but offers the advantage to interpolate data onto isopycnal coordinates rather than depth coordinates. More recent climatologies could be implemented too. \verb"makemprop.m" reads the climatology, interpolate the data onto isopycnals. Then, it isolates the data points located only in the box and calculate the mean area of the ocean interface and of all the layers as well as the mean (and standard deviation) pressure, temperature and salinity over each isopycnal.
+We use a climatology. For now, only the WOCE Global Hydrography Climatology (WGHC, \cite{Gouretski2004}). This is a relatively old climatology but offers the advantage to interpolate data onto isopycnal coordinates rather than depth coordinates. More recent climatologies could be implemented too. \verb"makemprop.m" reads the climatology, interpolate the data onto isopycnals. Then, it isolates the data points located only in the box and calculate the mean area of the ocean interface and of all the layers as well as the mean (and standard deviation) pressure, temperature and salinity over each isopycnal. \textbf{This script needs to be updated by the user to specifiy which climatology and which variables need to be loaded.}
 
 	\subsection{Calculate air-sea fluxes on outcropping layers (\textit{makeairsea.m})}
 

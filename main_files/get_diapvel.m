@@ -68,56 +68,48 @@ if exist(filename,'file') == 2
    % if yes, load the file
    eval(['load ' filename ' XCW Xcols']);
 else
-    %if not, create it and save it
+%if not, create it and save it
     for i = 1:nboxes 
-      command =['mprop_diap',int2str(i), ' area* msalt* mtemp*'];
-
+      command =['mprop_diap',int2str(i), ' area_layer msalt mptemp'];
+      
       % load data
       eval(['load ' dir command]);
-      % define salinity anomaly
-      eval(['msaltan_atl',int2str(i), ...
-        ' = (msalt_atl',int2str(i), ' - 35)*1e-3;']);
+            
+      % define salinity anomaly (!!!This can be changed but it also has to be
+      % changed in prepctd.m!!!)
+      msaltan= (msalt - 35)*1e-3;
 
     %... use diag to form the diagonal matrix with areas on the 
-    %... diagonal and -area on the next lower diagonal.
+    %... diagonal and -area_layer on the next lower diagonal.
 
-      eval(['m = length(area_atl', int2str(i), ');']);
-      eval(['[lg,icolg] = lastgood(mtemp_atl', int2str(i), ',''' '0' ''' );'])
+      m = length(area_layer);
+      [lg,icolg] = lastgood(mptemp','0')
 
-      eval(['mcol_atl', int2str(i), ' = diag(area_atl', int2str(i), ') +' ...
-            'diag(-area_atl', int2str(i), '(1:m-1), -1);'])
+      mcol = diag(area_layer) + diag(-area_layer(1:m-1),-1);
 
-      eval(['tcol_atl', int2str(i), ' = diag(area_atl', int2str(i), ...
-       '.*mtemp_atl', int2str(i), ') + diag(-area_atl', int2str(i), ...
-            '(1:m-1) .*mtemp_atl', int2str(i), '(1:m-1), -1);'])
+      tcol = diag(area_layer.*mptemp) + diag(-area_layer(1:m-1) .*mptemp(1:m-1), -1);
 
-      eval(['scol_atl', int2str(i), ' = diag(area_atl', int2str(i), ...
-       '.*msaltan_atl', int2str(i), ') + diag(-area_atl', int2str(i), ...
-            '(1:m-1) .*msaltan_atl', int2str(i), '(1:m-1), -1);'])
+      scol = diag(area_layer .* msaltan) + diag(-area_layer(1:m-1) .*msaltan(1:m-1), -1);
 
     %... add two rows of zeros to end of each diagonal matix. These 
     %... balance the xcol to give 18 rows for each property flux.
     %... The last good value of the xcol is the flux across the bottom
     %... boundary. For the Pacific this is at 895 dbars.
 
-      eval(['mcol_atl', int2str(i), ' = ' ...
-         '[mcol_atl', int2str(i), '; zeros(2,m)];']);
+      mcol = [mcol; zeros(2,m)];
 
-      eval(['tcol_atl', int2str(i), ' = ' ...
-         '[tcol_atl', int2str(i), '; zeros(2,m)];']);   
+      tcol = [tcol; zeros(2,m)];  
 
-      eval(['scol_atl', int2str(i), ' = ' ...
-         '[scol_atl', int2str(i), '; zeros(2,m)];']);
+      scol = [scol; zeros(2,m)];
 
     %... Form xcol matrix for each box
 
-      eval(['xcol_atl0 = zeros(size(mcol_atl', ...
-        num2str(i),'));']);
+      xcol0 = zeros(size(mcol));
 
       eval(['Xcols',int2str(i),' = ', ...
-        '[mcol_atl',num2str(i),' xcol_atl0 xcol_atl0;', ...
-        ' xcol_atl0 scol_atl',num2str(i),' xcol_atl0;', ...
-        ' xcol_atl0 xcol_atl0 tcol_atl',num2str(i),'];']);
+                                    '[mcol xcol0 xcol0;', ...
+                                    ' xcol0 scol xcol0;', ...
+                                    ' xcol0 xcol0 tcol];']);
 
 
     end;		% loop over boxes
@@ -139,7 +131,7 @@ else
     Xcols = Xcol_int;
     XCW   = XCW_int;
 
-    eval(['save ' filename ' Xcols XCW']); % Save
+    eval(['save ' filename ' Xcols XCW']); % Save  
 end % if
 return
 

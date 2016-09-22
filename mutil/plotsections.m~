@@ -1,4 +1,4 @@
-function plotsections(geometry)
+function plotsections(geometry,sectfiles)
 %==========================================================================
 % function plotsections(sm,cart)
 %
@@ -31,17 +31,16 @@ col='b';    % color
 
 sm=1;
 cart=1; 
-eval([geometry]);
 
 Lon=[];Lat=[];
 for i=1:size(geometry,2);
-    raw_filename = charword(sectfiles(i,:));
+    raw_filename = charword(sectfiles(ix,:));
     eval(['load ',raw_filename,'_raw lon lat']);
     % create a row vector.
     if size(lon,1) ~=1 % if lon and lat are column vectors
        Lon=[Lon,lon'];Lat=[Lat,lat'];
     else % if not
-       Lon=[Lon,lon];Lat=[Lat,lat];
+       Lon=[Lon,lon'];Lat=[Lat,lat'];
     end
     q=find(Lon<-180);Lon(q)=Lon(q)+360;
     q=find(Lon>180);Lon(q)=Lon(q)-360;
@@ -50,13 +49,13 @@ end;
 hld=ishold;
 if ~hld clf; end;
 
+minlon = min([-100 min(Lon)-10]);
 
-makemap([min(Lon)-10 max(Lon)+10],[min(Lat)-10 max(Lat)+10]);
+makemap([min(min(Lon),-100) max(Lon)],[min(Lat)-10 max(Lat)+10]);
 
 hold on;
 for i=1:size(geometry,2);	% loop through sections
-    raw_filename = charword(sectfiles(i,:));
-    eval(['load ',raw_filename,'_raw lon lat']);
+    eval(['load ',sectfiles(i,:),' lon lat']);
 
     % detect sections wrapping around dateline
     q=find(abs(diff(lon))>180);

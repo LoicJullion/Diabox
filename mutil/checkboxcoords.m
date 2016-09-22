@@ -2,6 +2,9 @@ function checkboxcoords(boxnum)
 %=========================================================================
 % function checkboxcoords(boxnum);
 %
+% Check that the polygons defining the boxes have been correctly set up by
+% plotting dots inside the box. 
+% 
 % AUTHORS: Rick Lumpkin, modified by Loic Jullion to make it user friendly.
 %
 %-----------------
@@ -44,9 +47,7 @@ for loopnum=1:length(boxnum);
     lonmat=ones(length(latmat),1)*lonmat;
     latmat=latmat'*ones(1,size(lonmat,2));
     inbox=NaN*ones(size(lonmat));
-
     
-
     q=find(isinpoly(lonmat,latmat,lon,lat));
     plot(lonmat(q),latmat(q),'.');
     hold off;

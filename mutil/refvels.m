@@ -5,6 +5,9 @@ function refvels(geometry,sectfiles,rv,vmag)
 % Define a reference velocity for all station pairs in a section.  
 % This is used by DIABOX during step 3.
 % 
+% An initial reference velocity is set in geo.m (usually 0). Here we save
+% the reference velocities in the directory ref_vel/
+% 
 % AUTHOR: Rick Lumpkin
 %
 % modified by Loic Jullion: Transformed in a function and uniquerefvels is
@@ -37,18 +40,20 @@ load dir_loc.mat refvel_dir
 % loop through sections;
 for i=1:size(geometry,2);
 
-  sectname=sectfiles(i,:);
-  Expression   = ['lon = loadvars(sectname,''lon'')'];
-  eval(Expression);
+    sectname=sectfiles(i,:);
+    Expression   = ['lon = loadvars(sectname,''lon'')'];
+    eval(Expression);
   
-  RV=rv(i)*ones(length(lon)-1,1)';
-  Vmag=vmag(i)*ones(length(lon)-1,1)';
-  q=find(sectname=='/');
-  sectname(1:last(q))=[];
-  q=find(sectname=='.');
-  sectname=sectname(1:q-1);
-  rvfilename=[refvel_dir,'/refvel_',sectname];
-  eval(['save ',rvfilename,' RV Vmag']);
+    RV=rv(i)*ones(length(lon)-1,1)'; % rv is set in geo.m
+    Vmag=vmag(i)*ones(length(lon)-1,1)'; % vmag (uncertainties) is set in geo.m
+    
+    % Strip out the path to the sections to keep just the section name
+    q=find(sectname=='/');
+    sectname(:,1:last(q))=[];
+    % Save the reference velocities and associated uncertainties in
+    % refvel_*.mat
+    rvfilename=[refvel_dir,'refvel_',sectname];
+    eval(['save ',rvfilename,' RV Vmag']);
 
-end;
+end % for
 return

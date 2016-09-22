@@ -53,7 +53,7 @@ for i=1:size(geometry,2);
   if size(lon,1) ~=1 % if lon and lat are column vectors
       Lon=[Lon,lon'];Lat=[Lat,lat'];
   else % if not
-      Lon=[Lon,lon'];Lat=[Lat,lat'];
+      Lon=[Lon,lon];Lat=[Lat,lat];
   end
   q=find(Lon<-180);Lon(q)=Lon(q)+360;
   q=find(Lon>180);Lon(q)=Lon(q)-360;
@@ -90,7 +90,7 @@ for j=1:size(geometry,1);	% loop through boxes
       if size(lon,1) ~=1 % if lon and lat are column vectors
           Lon=[Lon,lon'];Lat=[Lat,lat'];
       else % if not
-          Lon=[Lon,lon'];Lat=[Lat,lat'];
+          Lon=[Lon,lon];Lat=[Lat,lat];
       end
 
     end

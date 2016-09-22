@@ -38,6 +38,9 @@ function [lon_era,lat_era,lonvec,latvec,sss,index,sst,netheat,latent,sensible,lo
 %==========================================================================
 load dir_loc.mat climdir clim_asdir 
     %% Load the data
+    
+    fileext='.cdf';
+    
     eval(['ncid = netcdf.open(''' clim_asdir 'sst_erai.cdf'');']);
     varID   = netcdf.inqVarID(ncid,'longitude');
     lon_era = netcdf.getVar(ncid,varID);
@@ -46,7 +49,7 @@ load dir_loc.mat climdir clim_asdir
     q=find(lon_era>=180);
     lon_era(q)=lon_era(q)-360;
     [lon_era,ind_lon]=sort(lon_era);
-
+    
     varID   = netcdf.inqVarID(ncid,'latitude');
     lat_era = netcdf.getVar(ncid,varID);
     netcdf.close(ncid);
@@ -66,7 +69,7 @@ load dir_loc.mat climdir clim_asdir
         sensible  = sensible_mn_clim;
 
     else
-      fileext='.cdf';
+      
       fprintf('Loading ERA-Interim fields, year %d.\n',year);
       eval(['ncid = netcdf.open(''' clim_asdir 'sst_erai.cdf'');']);
       varID = netcdf.inqVarID(ncid,'time');

@@ -23,7 +23,8 @@ function [sectfile] = dosection(raw_filename, properties)
 %    and the bottom triangles are saved in add_tri (section_tria)
 %    
 %
-% AUTHOR:  Phil Morgan 12-03-92 Modified by Rick Lumpkin and Loic Jullion
+% AUTHOR:  Phil Morgan 12-03-92 Modified by Rick Lumpkin, Takamasa 
+%          Tsubouchi and Loic Jullion
 %
 %==========================================================================
 %
@@ -66,7 +67,7 @@ sectfile     = [dir_path,raw_filename];
 raw_filename          = charword(sectfile);   % strip blanks
 [raw_filename,fileok] = validfile(sectfile,'_raw.mat');
 if fileok
-   disp(['Loading data file {' sectfile ',_raw.mat}'])
+   disp(['Loading data file {' sectfile '_raw.mat}'])
    disp(' ')
    command=['load ' sectfile,'_raw.mat'];
    clear Ln;
@@ -131,6 +132,7 @@ for iprop = 2:nproperties
     end %for
 end %for
 
+% Pressure of the isopycnals at the station pairs
 surfPair_press    = avecol( surf_press );
 
 clear command VariableName PropName bin_prop ntriindex triindex mn nn 
@@ -146,6 +148,7 @@ end %if
 
 
 disp('Calculating deepest common pressures...')
+% This is the max pressure of the binPair properties
 Press2Row         = [bin_press [1:length(bin_press)]' ];
 [values,com_rows] = lastgood( eval(['binPair_' PropName2]),NaN);
 
@@ -153,6 +156,25 @@ pelp1=fliplr(Press2Row);
 com_press = interp1(pelp1(:,1),pelp1(:,2),com_rows);
 clear values PropName2 pelp1
 
+%%
+%=-=-=-=-=-= figutr of SurfPair -=-=-=-=-=-=-=-=-=-=-
+
+%reply = input('Do you want to draw SurfPair figure? (y/n): ','s');
+reply = char('y');
+if(strcmp(reply,'y'))
+
+mlon=avecol(lon);
+figure;
+hold on;
+plot(mlon,surfPair_press,'r-.'); axis ij
+plot(lon,surf_press,'k.');
+%plot(mlon,com_press,'k-');
+hold off;
+title('comparison between surfPair_press (red) and surf_press (black)');
+xlabel('longitude(deg)'); ylabel('pressure(dbar)');
+
+end
+%%
 disp('Finding valid surfaces above deepest common pressures...')
 surfPair_press_valid = surfPair_press;
 surfPair_bin         = NaN*ones(size(surfPair_press));
@@ -171,197 +193,272 @@ for ipair = 1:npairs
 end %for
 clear good bad ipair
 
+% Create a matrix that contains the top and bottom of each layer of the
+% model: The first row will be the surface, then the pressure of the
+% different isopycnals defined and finally the bottom depth.
 Layer_press=NaN*ones(nsurfs+2,npairs);
 Area_layer=NaN*ones(nsurfs+1,npairs);
 
-disp('Calculating thickness, area of Layers ... ')
-thick=NaN*ones(size(surf_press,1)+1,length(lon)-1);
-fprintf('  counting to %d: ',size(thick,2));
+Layer_press = [NaN*ones(size(surfPair_press_valid(1,:)));
+               surfPair_press_valid;
+	           NaN*ones(size(surfPair_press_valid(1,:)))];
 
-for i=1:length(lon)-1;
-  fprintf('%d ',i);
+[val1,itop] = firstgood(surfPair_press_valid,NaN);
+[val2,ibot] = lastgood( surfPair_press_valid,NaN);
 
-  % extract values of surf_press from both casts
-  sp1=surf_press(:,i);
-  sp2=surf_press(:,i+1);
-
-  q=find(isfinite(sp1)); if (length(q))
-  if sum(sp1(q)~=sort(sp1(q)))
-    fprintf('  gamma not monotonic in cast %d.\n',i);
-    sp1(q)=sort(sp1(q));
-  end;end;
-  q=find(isfinite(sp2)); if (length(q))
-  if sum(sp2(q)~=sort(sp2(q)))
-    fprintf('  gamma not monotonic in cast %d.\n',i+1);
-    sp2(q)=sort(sp2(q));
-  end;end;
-
-  % Add top and bottom level for layers 1, nsurfs+1.
-  % Add NaNs to top if upper layer doesn't exist
-  % or is at 0, otherwise add 0.  Same with bottom.
-  if (sp1(1)>0) sp1=[0;sp1];
-  else sp1=[NaN;sp1]; end;
-  if (sp2(1)>0) sp2=[0;sp2];
-  else sp2=[NaN;sp2]; end;
-  if (last(sp1)<bottom(i)) sp1=[sp1;bottom(i)];
-  else sp1=[sp1;NaN]; end;
-  if (last(sp2)<bottom(i+1)) sp2=[sp2;bottom(i+1)];
-  else sp2=[sp2;NaN]; end;
-
-  % In cases where only the uppermost or lowermost
-  % layer exists in a cast, spN is all NaNs.  Fix.
-  if (~sum(isfinite(sp1)) & sum(isfinite(sp2)) )
-    if (mean(find(isfinite(sp2)))>((nsurfs+2)/2)) 
-      sp1(nsurfs+1)=0;sp1(nsurfs+2)=bottom(i);
-      fprintf('  assigning deepest layer to cast %d.\n',i);
-    else
-      sp1(1)=0;sp1(2)=bottom(i);
-      fprintf('  assigning layer 1 to cast %d.\n',i);
-    end;
-  elseif (~sum(isfinite(sp2)) & sum(isfinite(sp1)) )
-    if (mean(find(isfinite(sp1)))>((nsurfs+2)/2))
-      sp2(nsurfs+1)=0;sp2(nsurfs+2)=bottom(i+1);
-      fprintf('  assigning deepest layer to cast %d.\n',i+1);
-    else
-      sp2(1)=0;sp2(2)=bottom(i+1);
-      fprintf('  assigning layer 1 to cast %d.\n',i+1);
-    end;
-  elseif (~sum(isfinite(sp1)) & ~sum(isfinite(sp2)) )
-    disp('Cannot identify layers in dosection.m');
-    keyboard;
-  end;
-  
-  % should have min(diff(spN))>0.  Fix if not happening
-  q=find(diff(sp1)==0);
-  if (length(q))
-      disp('WARNING!  diff(sp1) has a zero\n')
-      if q<(nsurfs/2)
-        sp1(q+1)=.5*(sp1(q)+sp1(q+2));
-      else
-        sp1(q)=.5*(sp1(q-1)+sp1(q+1));
-      end;
-  end;
-  q=find(diff(sp2)==0);
-  if (length(q))
-      disp('WARNING! diff(sp2) has a zero - \n')
-      if q<(nsurfs/2)
-          sp2(q+1)=.5*(sp2(q)+sp2(q+2));
-      else
-        sp2(q)=.5*(sp2(q-1)+sp2(q+1));
-      end;
-  end;
-
-  dx=sw_dist([lat(i) lat(i+1)], ...
-        [lon(i) lon(i+1)],'km')*1e3;
-  % calculate area of each layer between casts
-  % using routine interpcasts.m
-  [A,LayP]=interpcasts( ...
-	sp1,sp2,[bottom(i) bottom(i+1)],dx,nsurfs);
-  Area_layer(:,i)=A;
-  thick(:,i)=A/dx;
-  q=find(isnan(thick(:,i)));
-  thick(q,i)=0;
-  Layer_press(:,i)=LayP;
-end;
-fprintf('\n');
-thick = change(thick,'==',NaN,0);
-clear i A dx q lp lp2 sp1 sp2 LayP ans;
+% (2013.10.28.) modified to deal with region where you do not have any
+% surf_press value.
+for ipair = 1:npairs  %length(val1)
+    % Fill in the pressure of the top of the first layer. We set to the
+    % first pressure from bin_press.
+    Layer_press( 1,   ipair) = bin_press(1); 
+    % Now we need to add a bottom to the last layer.
+    if ~isnan(ibot(ipair))
+       % 1) There is at least 1 isopycnal present at the station pair. Then 
+       % find which one it is (ibot(ipair)), and add the depth of the
+       % bottom triangle (com_press(ipair)) as the lower limit of the layer
+       Layer_press( ibot(ipair)+2, ipair) = com_press(ipair);
+    elseif isnan(ibot(ipair))
+       % 2) If no isopycnal is present at this station pair, then add the 
+       % depth of the bottom triangle to the bottom of the first layer.
+       Layer_press( 2, ipair) = com_press(ipair);
+    end %if
+end %for
 
 Layer_bin = NaN*ones(size(Layer_press));
+
 for ipair = 1:npairs
    goodi=find( ~isnan(Layer_press(:,ipair)) );
    % length(goodi) = 0 (ok, no surfs))
    if length(goodi) > 1
-      Layer_bin(goodi,ipair) = fix(interp1( ...
-	Press2Row(:,1),Press2Row(:,2),Layer_press(goodi,ipair)) );
+%      Layer_bin(goodi,ipair) = fix(table1(Press2Row,Layer_press(goodi,ipair)) );
+       Layer_bin(goodi,ipair) = fix(Layer_press(goodi,ipair));
    elseif length(goodi) == 1
       error('dosection.m: must have more than 1 surface to define layers')
    end %if
 end %for
+
 clear Press2Row goodi
 
-clear val1 val2 itop ibot
+%%
+disp('Calculating thickness of Layers ... ')
+% elm 29.9.99 - calculate thickness from integrated frac so that
+% bottom triangle area is properly incorporated
 
+% Layer_press is integrated, taking into account the bottom triangle to
+% calculate the thickness of the layers
+thick = NaN*ones(nlayers,npairs);
+
+for ipair = 1:npairs
+    good_p      = Layer_press(:,ipair);
+    good_surf   = find(~isnan(good_p));
+    F_good = [];
+    F_good = integrate(bin_press,frac(:,ipair),good_p(good_surf));
+    % INSERT INTEGRATE FLUXES INTO VALID LAYERS, OTHERS LEFT AS NaN
+    for igood = 1:length(F_good)
+        thick(good_surf(igood),ipair)   = F_good(igood);
+    end %for
+end %for
+
+thick = change(thick,'==',NaN,0);
+
+%reply2 = input('Do you want to draw thickness figure? (y/n): ','s');
+reply2 = char('y');
+if(strcmp(reply2,'y'))
+
+    nlayer=size(Layer_press,1);
+    
+    figure;
+    % This plot is misleading. Looking at it, one might think that some
+    % isopycnals are not intersecting the topography and stopping in the
+    % middle of the water column. This is not the case, when an isopycnal
+    % seem to disappear (or appear) in the middle of nowhere, it just 
+    % means that this isopycnal is not present at the next/preceding
+    % station pair and therefore it must be running into the topography
+    % between the station pairs. Therefore at the preceding/next station
+    % pair, the layer defined by this isopycnal is not present.
+    hold on;
+    for II=1:nlayer; 
+        plot(Layer_press(II,:),'k-','LineWidth',2); 
+    end
+    
+    npair=length(com_press);
+    maxpr=max(bin_press)+10;
+    
+    for JJ=1:npair;
+        sline=[JJ,JJ];
+        plot(sline,[0,maxpr],'b--');
+    end;
+        
+    plot(com_press,'r--.','LineWidth',1); 
+
+    hold off;
+    axis ij;
+    title('Layer_press (black) com_press (red) stationpair(blue)');
+
+    figure;
+    hold on
+    for II=1:nlayers;
+        if(II==1);plot(thick(II,:),'r-','LineWidth',2);end;
+        if(II==2);plot(thick(II,:),'g-','LineWidth',2);end;
+        if(II==3);plot(thick(II,:),'b-','LineWidth',2);end;
+        if(II==4);plot(thick(II,:),'m-','LineWidth',2);end;
+        if(II==5);plot(thick(II,:),'k-','LineWidth',2);end;
+    end
+    legend('layer1','layer2','layer3','layer4','layer5',-1);
+    grid on;
+    hold off;
+    axis ij;
+    title('Layer thickness for each layer');
+
+end % if
+%%
 disp('Calculating mean property value in middle of LayerPair for ')
 
 LayerPair_mass = ones(nsurfs+1,npairs);
 
 for iprop = 2:nproperties
-    PropName = [charword( properties(iprop,:) )];
-    disp(['     ' PropName])
-    binPair_property = eval(['binPair_'   PropName]);
+   PropName = [charword( properties(iprop,:) )];
+   disp(['     ' PropName])
+   binPair_property = eval(['binPair_'   PropName]);
 
-    IntLayer_prop  = [];
-
-    for ipair = 1:npairs
-        IntLayerPair_prop   = NaN*ones(1,nlayers);
+   IntLayer_prop  = [];
+     
+   for ipair = 1:npairs
+     IntLayerPair_prop   = NaN*ones(1,nlayers);
   
-        % FIND VALID NEUTRAL SURFACES FOR A STATION PAIR. incl csurf and bottom
-        good_p      = Layer_press(:,ipair); 
-        good_surf   = find(~isnan(good_p)); 
+     %% FIND VALID NEUTRAL SURFACES FOR A STATION PAIR. incl csurf and bottom
+      good_p      = Layer_press(:,ipair); 
+      good_surf   = find(~isnan(good_p)); 
   
-        % INTEGRATE PROP DOWN A STATION PAIR BETWEEN VALID SURFACES
-        if (~isempty(good_surf) & 0)
-            F_good = [];
-            F_good = integrate(bin_press,binPair_property(:,ipair),good_p(good_surf));
-            % INSERT INTEGRATE FLUXES INTO VALID LAYERS, OTHERS LEFT AS NaN
-            for igood = 1:length(F_good)
-                IntLayerPair_prop(good_surf(igood))   = F_good(igood);
-            end %for
-        else 
-            for igood=1:length(good_surf)-1;
-                q=find(bin_press>=good_p(good_surf(igood)) & ...
-                bin_press<=good_p(good_surf(igood+1)));
-                if ~length(q) 
-                    q2=find(bin_press>good_p(good_surf(igood+1)));
-                    q=q2(1);
-                end
-                IntLayerPair_prop(good_surf(igood))=nanmean( ...
-                binPair_property(q,ipair) );
-            end
-        end %if
+     %% INTEGRATE PROP DOWN A STATION PAIR BETWEEN VALID SURFACES
+     if ~isempty(good_surf)
+%$$$    y  = binPair_property(:,ipair)
+%$$$ 	x  = bin_press
+%$$$ 	xi = good_p(good_surf)
+	F_good = [];
+% elm 29.9.99 scale bin_pair property by frac so that integrated property
+% is properly weighted
+%        F_good = integrate(bin_press,binPair_property(:,ipair),good_p(good_surf));
+        F_good = integrate(bin_press,frac(:,ipair).*binPair_property(:,ipair),good_p(good_surf));
+       %% INSERT INTEGRATE FLUXES INTO VALID LAYERS, OTHERS LEFT AS NaN
+       for igood = 1:length(F_good)
+         IntLayerPair_prop(good_surf(igood))   = F_good(igood);
+       end %for
+     end %if
+     
+     
+     %% APPEND INTEGRATION OF ONE STATION PAIR FLUXES INTO A SECTION OF FLUXES
+     IntLayer_prop   = [IntLayer_prop IntLayerPair_prop'];
 
-        % APPEND INTEGRATION OF ONE STATION PAIR FLUXES INTO A SECTION OF FLUXES
-        IntLayer_prop   = [IntLayer_prop IntLayerPair_prop'];
-
-    end % loop over ipair
-    clear F_good binPair_property igood good_p good_surf 
+   end %for
+   clear F_good binPair_property igood good_p good_surf 
    
-    Layer_mean = IntLayer_prop;
-    Layer_mean = change(Layer_mean,'==',NaN,0);
+   % want Intergrated_property between surfaces (ie in layer) divided
+   % by layer thickness.  Avoid division by zero error messages.
+   bad = find( thick==0);
+   goodthick = thick;
+   if ~isempty(bad)
+      goodthick(bad) = ones(1,length(bad));
+   end %if
+   Layer_mean     = IntLayer_prop ./ goodthick;
+   Layer_mean     = change(Layer_mean,'==',NaN,0);
+   if ~isempty(bad)
+      Layer_mean(bad) = zeros(1,length(bad));
+   end %if
+   clear bad goodthick
 
-
-    VariableName = ['LayerPair_' PropName];
-    command = [VariableName ' = Layer_mean;'];
-    eval(command)
+   VariableName = ['LayerPair_' PropName];
+   command = [VariableName ' = Layer_mean;'];
+   eval(command)
    
-end %for  
+end %for   
+
+% ---- FIGURE -------
+
+dfig = 0;
+
+if (dfig == 1);
+    figure;
+    pcolor(LayerPair_temp); shading flat; colorbar; axis ij; caxis([-1.5 4]);
+    title('LayerPair_temp');
+
+    figure;
+    plot(LayerPair_temp,'r.'); axis([0 6 -1.5 7]);
+    title('LayerPair_temp');
+    
+    figure;
+    pcolor(LayerPair_sal); shading flat; colorbar; axis ij; caxis([33.8 34.8]);
+    title('LayerPair_sal');
+
+    figure;
+    plot(LayerPair_sal,'b.'); axis([0 6 33.6 34.8]);
+    title('LayerPair_sal');
+    
+end % if   
+
+% -------------------
+
 
 clear iprop Layer_mean IntLayer_prop binPair_prop IntLayerPair_prop
 clear good_p good_surf PropName
 
+disp('Calculating AreaPair ...')
 deldistkm      = dobox_distance(lat,lon,'km');
 distkm         = cumsum([0 deldistkm]);
-
+Area_layer     = thick*diag(1000*deldistkm);
+% remove next section elm 29.9.99
+% note for clarification - elm 14/4/00 - area_tri is no longer addaed
+% explicitly because thick is calculated from integrated frac   
+%    if strcmp(reply,'y') == 1
+%        add_tri = input('Add tri file:  ','s');
+%        eval(['load ' add_tri]);
+%         for iadd = 1:nstations -1
+%           tt(iadd) = max(find(Area_layer(:,iadd) > 0));
+%           Area_layer(tt(iadd),iadd) = ...
+%                Area_layer(tt(iadd),iadd) + area_tri(iadd);
+%         end %(for)
+%     end %(if)
 disp('Calculating Area_properties for')
 disp('     mass')
+
 Area_mass = Area_layer;
 
-for iprop = 2:nproperties
-    PropName = [charword( properties(iprop,:) )];
-    disp(['     ' PropName])
-    LayerPair_prop = ['LayerPair_'   PropName];
 
-    VariableName = ['Area_' PropName];
-    Expression   = ['Area_layer .* ' LayerPair_prop];
-    command = [VariableName ' = ' Expression ';'];
-    eval(command)
+for iprop = 2:nproperties
+   PropName = [charword( properties(iprop,:) )];
+   disp(['     ' PropName])
+   LayerPair_prop = ['LayerPair_'   PropName];
+
+%  Area_prop  = Area_layer .* LayerPair_prop;
+      VariableName = ['Area_' PropName];
+      Expression   = ['Area_layer .* ' LayerPair_prop];
+      command = [VariableName ' = ' Expression ';'];
+      eval(command)
 end %for   
 clear iprop VariableName Expression command LayerPair_prop PropName
 clear tt add_tri
 clear TRUE FALSE
 
-clear q q2 
+prompt_user = 0;  % do not prompt user to overwrite if sectfile passed
+if exist('sectfile')==0
+   sectfile = input('What filename to save this section? ','s');
+   prompt_user = 1;
+end %if
+
+[sectfile,file_exists] = validfile(sectfile,'.mat');
+if file_exists
+   if prompt_user
+       reply = input('File exists, overwrite (y/n) ? [n] ','s');
+       if ~strcmp(lower(reply),'y')
+           error('ABORT. No overwriting of existing file')
+       end %if
+   end %if
+else
+   % ok - batch mode
+end %if
+clear file_exists prompt_user
+
 
 disp(['Saving file {' sectfile '} '])
 command = ['save  ' sectfile];

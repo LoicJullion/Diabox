@@ -26,7 +26,7 @@
 %                       the same or similar license to this one.
 %-----------------
 % AUTHORS:
-%    Loïc Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
+%    Lo?c Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
 %    and the many collaborators who helped me improve my understanding of
 %    inverse modelling.
 %
@@ -121,11 +121,19 @@ while box_menu_stop == 0
     % 1) First, define for each section a common value for all the stations 
     % pair 
     refvels(geometry,sectfiles,rv,vmag);
+    
     % 2) Now run "uniquerefvels.m" for sections with particular barotropic 
     %    structure in the initial guess. This file is specific to each
     %    inversion and needs to be modified accordingly.
-    uniquerefvels;
-    
+    set_uniquerefvels = 0;
+    if set_uniquerefvels == 1
+       uniquerefvels;
+    else
+       disp('No specific choices for the reference velocities have been made')
+       disp('The default reference velocities and uncertainties set in geo.m will be used')
+       disp('If specific reference velocities or uncertainties need to be set, use the uniquerefvels.m file and set set_uniquerefvels to 1')
+       s = input('Hit "enter" to continue','s');
+    end
     % Initialize the matrices containing the a apriori transport
     DL=[]; D=[]; bbase=[]; 
     [DL,D,bbase,reflevel] = rhs_menu(geometry,sectfiles,properties,DL,D,bbase,reflevel);
@@ -153,8 +161,11 @@ while box_menu_stop == 0
 
     % row_beg: First row for each box
     % row_end: Last row for each box
-    % col_beg: First col for each ctd section + each Xcol term
-    % col_end: Last col for each ctd section + each Xcol term;
+    % col_beg: First col for each ctd section 
+    % col_end: Last col for each ctd section
+    % The last term of col_beg and col_end mark the beginning and end of
+    % the extra terms (for example, 3 boxes with 3 layer interface will
+    % give 27 extra columns (3 layers * 3 properties * 3 boxes)
     [row_beg,row_end,col_beg,col_end] = ...
           set_xindex(Xrows,Xcols,row_beg,row_end, ...
                      col_beg,col_end,nboxes,nsections);

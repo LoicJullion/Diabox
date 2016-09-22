@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  18 JUL 2015 14:23
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  7 APR 2016 14:58
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -274,36 +274,60 @@ Underfull \hbox (badness 10000) in paragraph at lines 74--75
 
 [3
 
-] [4] [5] [6] <fig1.pdf, id=35, 845.0471pt x 597.51233pt>
+] [4] [5] [6]
+Underfull \hbox (badness 10000) in paragraph at lines 210--214
+[]\OT1/cmr/m/n/12 The hy-dro-graphic sec-tions need to be con-verted into Mat-l
+ab for-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 210--214
+\OT1/cmr/m/n/12 mat first. The hy-dro-graphic sec-tions are for-mat-ted us-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 210--214
+[]\OT1/cmtt/m/n/12 prepctd.m\OT1/cmr/m/n/12 . In the di-rec-tory that was cre-a
+ted for the in-ver-sion, run:
+ []
+
+
+Overfull \hbox (178.27031pt too wide) in paragraph at lines 210--214
+[] 
+ []
+
+[7] <fig1.pdf, id=40, 845.0471pt x 597.51233pt>
 File: fig1.pdf Graphic file (type pdf)
  <use fig1.pdf>
-Package pdftex.def Info: fig1.pdf used on input line 229.
+Package pdftex.def Info: fig1.pdf used on input line 236.
 (pdftex.def)             Requested size: 426.79134pt x 301.77325pt.
-
-[7] [8 <./fig1.pdf>] [9]
+ [8 <./fig1.pdf>]
 Missing character: There is no Ò in font cmr12!
 Missing character: There is no Ó in font cmr12!
 Missing character: There is no Ò in font cmr12!
 Missing character: There is no Ó in font cmr12!
+[9]
 Missing character: There is no Ð in font cmr12!
 Missing character: There is no Ð in font cmbx12!
+Missing character: There is no Ð in font cmr12!
+Missing character: There is no Ð in font cmr12!
+Missing character: There is no Õ in font cmr12!
+Missing character: There is no Ð in font cmr12!
  [10]
-Missing character: There is no Ð in font cmr12!
-Missing character: There is no Ð in font cmr12!
 Missing character: There is no Õ in font cmr12!
-Missing character: There is no Ð in font cmr12!
-Missing character: There is no Õ in font cmr12!
- [11]
-<fig2.pdf, id=81, 435.66977pt x 275.78693pt>
+ <fig2.pdf, id=78, 435.66977pt x 275.78693pt>
 File: fig2.pdf Graphic file (type pdf)
  <use fig2.pdf>
-Package pdftex.def Info: fig2.pdf used on input line 330.
+Package pdftex.def Info: fig2.pdf used on input line 337.
 (pdftex.def)             Requested size: 512.1496pt x 324.23064pt.
 
-Overfull \hbox (42.39458pt too wide) in paragraph at lines 330--331
+Overfull \hbox (42.39458pt too wide) in paragraph at lines 337--338
  [] 
  []
 
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 Missing character: There is no Õ in font cmr12!
 Missing character: There is no Ò in font cmr12!
 Missing character: There is no Ó in font cmr12!
@@ -312,7 +336,7 @@ Missing character: There is no Ó in font cmr12!
 Missing character: There is no Ò in font cmr12!
 Missing character: There is no Ó in font cmr12!
 Missing character: There is no Õ in font cmr12!
-[12 <./fig2.pdf>]
+[11]
 Missing character: There is no Õ in font cmr12!
 Missing character: There is no Õ in font cmr12!
 Missing character: There is no Õ in font cmr12!
@@ -326,6 +350,7 @@ Missing character: There is no Ð in font cmr12!
 Missing character: There is no Õ in font cmr12!
 Missing character: There is no Õ in font cmr12!
 Missing character: There is no É in font cmr12!
+ [12 <./fig2.pdf>]
 Missing character: There is no Ò in font cmtt12!
 Missing character: There is no Ó in font cmtt12!
 Missing character: There is no Ò in font cmtt12!
@@ -336,79 +361,78 @@ Missing character: There is no Õ in font cmr12!
 Missing character: There is no Ò in font cmr12!
 Missing character: There is no Ó in font cmr12!
  [13]
-Underfull \hbox (badness 10000) in paragraph at lines 399--411
+Underfull \hbox (badness 10000) in paragraph at lines 408--420
 
  []
 
 [14]
 
 Package natbib Warning: Citation `Gouretski2004' on page 15 undefined on input 
-line 430.
+line 439.
 
-[15] <fig4.pdf, id=103, 688.5725pt x 469.755pt>
+<fig4.pdf, id=100, 688.5725pt x 469.755pt>
 File: fig4.pdf Graphic file (type pdf)
  <use fig4.pdf>
-Package pdftex.def Info: fig4.pdf used on input line 448.
+Package pdftex.def Info: fig4.pdf used on input line 457.
 (pdftex.def)             Requested size: 512.1496pt x 349.39806pt.
 
-Overfull \hbox (42.39458pt too wide) in paragraph at lines 448--449
+Overfull \hbox (42.39458pt too wide) in paragraph at lines 457--458
  [] 
  []
 
-[16 <./fig4.pdf>] [17] [18] [19] [20]
-Overfull \hbox (157.53896pt too wide) in paragraph at lines 608--609
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[15] [16 <./fig4.pdf>] [17] [18] [19]
+Overfull \hbox (157.53896pt too wide) in paragraph at lines 617--618
 \OT1/cmr/m/n/12 ([]\OT1/cmtt/m/n/12 rhs_menu.m). The matrix D is constructed an
 d the geostrophic velocities are saved in \verb\OT1/cmr/m/n/12 getfluxes.m". 
  []
 
-[21]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 624.
+[20]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 633.
 
  (/usr/local/texlive/2012/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 624.
- [22]
-[23] (./usingDiabox.bbl)
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 633.
+ [21]
+[22] (./usingDiabox.bbl)
 
 Package natbib Warning: There were undefined citations.
 
-[24
+[23
 
-] (./usingDiabox.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+] (./usingDiabox.aux) ) 
 Here is how much of TeX's memory you used:
  2891 strings out of 493488
  40743 string characters out of 3141326
- 109168 words of memory out of 3000000
+ 110168 words of memory out of 3000000
  6158 multiletter control sequences out of 15000+200000
  9382 words of font info for 33 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  38i,12n,32p,1374b,255s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
-></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><
-/usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb>
-</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
-/usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></
-usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
-r/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
-local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/lo
-cal/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/loca
-l/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/t
-exlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texl
-ive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
-ve/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive
-/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2
-012/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/20
-12/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on usingDiabox.pdf (24 pages, 1122903 bytes).
+</usr/local/texlive/2012/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmbx12.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmbx8.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmbxti10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmex10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmmi12.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmmi8.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmr12.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr17.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
+.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.
+pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pf
+b></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb><
+/usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on usingDiabox.pdf (23 pages, 1122844 bytes).
 PDF statistics:
- 211 PDF objects out of 1000 (max. 8388607)
- 144 compressed objects within 2 object streams
+ 208 PDF objects out of 1000 (max. 8388607)
+ 142 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

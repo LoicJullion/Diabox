@@ -15,32 +15,49 @@
 % region: f held constant from lat_eq to equator,
 % and "Ekman" transport angle rotates from 90deg
 % at lat_eq to 0deg (downwind) at equator
-lat_eq=2;
+lat_eq = 2;
 
 %% Calculate gamma, alpha, beta and Cp 
-% 1) Calculate gamma (the slow part!)
-[nummonths,numdat]=size(sss);
-disp('Calculating gamma.');
-ssg=NaN*ones(nummonths,numdat);
-latg=latvec;
-q=find(latg>63.999);
-if (length(q)) latg(q)=63.999; end;
-q=find(latg<-79.999);
-if (length(q)) latg(q)=-79.999; end;
-long=lonvec;
-q=find(long<0);
-if (length(q)) long(q)=long(q)+360; end;
-for month=1:nummonths;
-  fprintf('  Month %d of %d.\n',month,nummonths);
-  q=find(isfinite(sst(month,:)));
-  if (length(q))
-    ssg(month,:)=gamman(sss(month,:),sst(month,:),zeros(size(lonvec)),long,latg);
-  end;
-end;
-q=find(ssg<-90);
-ssg(q)=NaN;
-clear long latg nummonths numdat
+if strcmp(dens_choice,'gamma') 
+    % 1) Calculate gamma (the slow part!)
+    [nummonths,numdat]=size(sss);
+    disp('Calculating gamma.');
+    ssg=NaN*ones(nummonths,numdat);
+    latg=latvec;
+    q=find(latg>63.999);
+    if (length(q)) latg(q)=63.999; end;
+    q=find(latg<-79.999);
+    if (length(q)) latg(q)=-79.999; end;
+    long=lonvec;
+    q=find(long<0);
+    if (length(q)) long(q)=long(q)+360; end;
+    for month=1:nummonths;
+        fprintf('  Month %d of %d.\n',month,nummonths);
+        q=find(isfinite(sst(month,:)));
+        if (length(q))
+            ssg(month,:)=gamman(sss(month,:),sst(month,:),zeros(size(lonvec)),long,latg);
+        end
+    end
+    q=find(ssg<-90);
+    ssg(q)=NaN;
+    clear long latg nummonths numdat
+elseif strcmp(dens_choice,'pden') % Potential density
+    
+    % Calculate the potential density referenced to the surface
+    for month=1:nummonths;
+        fprintf('  Month %d of %d.\n',month,nummonths);
+        q=find(isfinite(sst(month,:)));
+        if (length(q))
+            ssg(month,:) = sw_pden(sss(month,:),sst(month,:),zeros(size(lonvec)),0)-1000;
+        end
+    end
+    q=find(ssg<-90);
+    ssg(q)=NaN;
 
+
+else 
+   error('Please choose the correct density choice (''gamma'' or ''pden'')'); 
+end
 % 2) Calculate alpha (thermal expansion coeff., deg. C^-1), 
 %    beta (saline contraction coeff., psu^-1) and Cp (specific heat, J/ kg C).
 alpha = NaN*ones(size(sss));

@@ -54,29 +54,22 @@ includemixing_ap = 0;	% set to 1 to include drD_ap
 SILCATerror=500;	% silicate conserved at this rate (kmol/s)
 % original: 10.  Robbins and Toole: 100.  Ganachaud et al: 700
 
-masslayererror=masslayererror*ones(size(glayers)); % One error per layer
+masslayererror=masslayererror*ones(nlayers,1); % One error per layer
 
-% Magnify the layer errors in layers 1:6 according
-% to seasonal fluctuations in Florida Strait sections
-masslayererror(1:6)=masslayererror(1:6).* ...
-	[6 5.5 5 4.5 4 2]';
-
-masslayererror=masslayererror*1e6; % transform in Sv
+masslayererror=masslayererror.*1e6; % transform in Sv
 
 mindiaflux=mindiaflux*1e6; % transform in Sv
 
 %% % 1) Errors on the conservation equations
 % allocate memory for model error
+% nlayers + 1 because we add a row for the full depth transport
 modelerror = NaN*ones(nlayers+1,nproperties,nboxes);
-
+load glevels.mat glevels
 % Loop over all the boxes
 for boxnum=1:nboxes
   % 1a) mass errors 
   % set layer errors to masslayererror
   modelerror(1:nlayers,1,boxnum) = masslayererror;
-  % assign a very small error to non-existing layers
-  % defined_layers is calculated in getXcol.m
-  modelerror(find(~defined_layers(:,boxnum)), 1,boxnum)=.01e6;
 
   % assign masstotalerror 
   modelerror(nlayers+1,1,boxnum)=masstotalerror(boxnum);
@@ -92,28 +85,22 @@ for boxnum=1:nboxes
   % identify the sections surrounding this box
   sects = find(geometry(boxnum,:));
   % loop through sections, loading layer-mean properties
-  std_potmp=[];std_salam=[];
-  for sectnum=1:length(sects);
-    eval(['load ',sectfiles(sects(sectnum),:), ...
-	' LayerPair_potmp LayerPair_salam;']);
-    std_potmp=[std_potmp,LayerPair_potmp];
-    std_salam=[std_salam,LayerPair_salam];
+  potmp_box_layer=[];salam_box_layer=[];
+  for sectnum = 1:length(sects);
+        eval(['load ',sectfiles(sects(sectnum),:), ...
+	'   LayerPair_potmp LayerPair_salam;']);
+      potmp_box_layer = [potmp_box_layer,LayerPair_potmp];
+      salam_box_layer = [salam_box_layer,LayerPair_salam];
   end;
   % remove 0s (empty pairs in LayerPair_*)
   % and calculate layer std.deviations.
-  q=find(~std_potmp);std_potmp(q)=NaN;
-  q=find(~std_salam);std_salam(q)=NaN;
-  mean_salam=abs(nanmean(std_salam')');
-  mean_potmp=abs(nanmean(std_potmp')');
-  std_potmp=fillnans(nanstd(std_potmp')',0);
-  std_salam=fillnans(nanstd(std_salam')',0);
-
-  mean_salam2=abs(fillnans(interp1(glevels, ...
-	meanprop(:,2,boxnum),glayers,'linear'),0));
-  mean_potmp2=abs(fillnans(interp1(glevels, ...
-        meanprop(:,3,boxnum),glayers,'linear'),0));
-  mean_salam=max([mean_salam,mean_salam2]')';
-  mean_potmp=max([mean_potmp,mean_potmp2]')';
+  q = find(~potmp_box_layer);potmp_box_layer(q)=NaN;
+  q = find(~salam_box_layer);salam_box_layer(q)=NaN;
+  
+  mean_salam = abs(nanmean(salam_box_layer')');
+  mean_potmp = abs(nanmean(potmp_box_layer')');
+  std_potmp  = fillnans(nanstd(potmp_box_layer')',0);
+  std_salam  = fillnans(nanstd(salam_box_layer')',0);
 
   % assign (abs(mean) + 2 std)*mass flux error to modelerror
   modelerror(1:nlayers,2,boxnum)= (abs(mean_salam)+2*std_salam).* ...
@@ -238,14 +225,14 @@ Rxx(indv,indv)=diag(vmag.^2);
 
 for boxnum=1:nboxes;
     
-  wmag=NaN*ones(nlayers-1,nproperties);
-  for propnum=1:nproperties;
+  wmag = NaN*ones(nlayers-1,nproperties);
+  for propnum = 1:nproperties
 
-    pfluxrel=-sum(D(indb(1:nlayers,propnum,boxnum),indv),2);
-    pfluxek=sum(EkmanE(1:nlayers,propnum,boxnum,:),4);
-    Psi=[flipud(cumsum(flipud(pfluxrel+pfluxek)));0];
+    pfluxrel = -sum(D(indb(1:nlayers,propnum,boxnum),indv),2);
+    pfluxek  = sum(EkmanE(1:nlayers,propnum,boxnum,:),4);
+    Psi      = [flipud(cumsum(flipud(pfluxrel+pfluxek)));0];
     % include direct air-sea input
-    Psi=Psi+[flipud(cumsum(flipud(AirSea(:,propnum,boxnum))));0];
+    Psi = Psi+[flipud(cumsum(flipud(AirSea(:,propnum,boxnum))));0];
     % include a priori diapycnal advection
     % (note: "Psi" becomes Psi+drD-F at this step)
     wap=[W_ap(:,boxnum), W_ap(:,boxnum)];
@@ -253,10 +240,13 @@ for boxnum=1:nboxes;
       wap=wap+[wadj,-wadj];
     end;
     %note that -W_ap(:,1).*[0;level_area_nonans(:,1);0]=Fdens(:,1);
-    Psi=[Psi,Psi]-[[0,0];wap(2:nlayers,:).* ...
+    Psi = [Psi,Psi]-[[0,0];wap(2:nlayers,:).* ...
 	(level_area_nonans(:,boxnum)*ones(1,2) ).* ...
 	(meanprop_nonans(:,propnum,boxnum)*ones(1,2));[0,0]];
     clear wap;
+    
+    %----------------------------------------------------------------------
+    % From Rick's code
     % adjusted Psi will conserve net property, i.e. go to zero
     % at gamma2(1).  Assume these adjustments are evenly-
     % distributed across the layers
@@ -266,7 +256,10 @@ for boxnum=1:nboxes;
     %  by the large negative (to lighter layers) F_as, producing
     %  small values of wmag when large ones are needed to
     %  counter F_as (Niiler-Stevenson balance)
-    if (1)
+    % Note by Loic: Not sure I really understand this bit of the code. It
+    % may matter for a global inversion but probably not for regional
+    % inversions
+    if (0)
       mPsi=nanmean(Psi')';
       q=min(find(mPsi==0 & gamma2>27));
       q2=max(find(~abs(diff(mPsi)) & glayers<27))+1;
@@ -275,21 +268,22 @@ for boxnum=1:nboxes;
         1:length(gamma2)))',0) *ones(1,2);
       Psi=Psi-mPsi;
       clear mPsi;
-    end;
-
+    end
+    %----------------------------------------------------------------------
+    
     if (propnum==1) 
-      wadj=Psi(:,1)./[NaN;level_area(:,boxnum);NaN];
-      q=find(isnan(wadj));wadj(q)=0;
+      wadj    = Psi(:,1)./[NaN;level_area(:,boxnum);NaN];
+      q       = find(isnan(wadj));
+      wadj(q) = 0;
     end;
   
-    diafluxmag=abs(-Psi);
-    diafluxmag=nanmax(diafluxmag')';
+    diafluxmag = abs(-Psi);
+    diafluxmag = nanmax(diafluxmag')';
 
     % drop endpoints to get glevels grid
-    diafluxmag=diafluxmag(2:length(diafluxmag)-1);
-    wmag(:,propnum)=diafluxmag./level_area(:,boxnum) ...
-	./abs(meanprop(:,propnum,boxnum));
-  end;  % loop over propnum
+    diafluxmag      = diafluxmag(2:length(diafluxmag)-1);
+    wmag(:,propnum) = diafluxmag./level_area(:,boxnum) ./abs(meanprop(:,propnum,boxnum));
+  end % loop over propnum
 
   % Allow for a little "slop" in the system: don't force
   % each and every level to have the minimum mixing according
@@ -305,63 +299,49 @@ for boxnum=1:nboxes;
   % with strong lateral eddy fluxes across isopycnals
   % in the mixed layer.
   if (1)
-  q=max(find(AirSea(:,3,boxnum)~=0));
-  if (q>nlayers-1) q=nlayers-1; end;
-  mindiafluxL=mindiaflux*ones(nlayers-1,1);
-  mindiafluxL(1:q)=2*mindiafluxL(1:q);
-  sarea=level_area(:,boxnum) * ones(1,nproperties) ...
-	.*abs(meanprop(:,:,boxnum));
-  magprop=nanmean(wmag.*sarea);
-  magprop=magprop./magprop(1);
-  wmag=wmag+(mindiafluxL*magprop)./sarea;
-  clear mindiafluxL q;
-    end;
+      q = max(find(AirSea(:,3,boxnum)~=0));
+      if (q>nlayers-1) q=nlayers-1; end;
+      mindiafluxL = mindiaflux*ones(nlayers-1,1);
+      mindiafluxL(1:q) = 2*mindiafluxL(1:q);
+      sarea            = level_area(:,boxnum) * ones(1,nproperties) ...
+                             .*abs(meanprop(:,:,boxnum));
+      magprop = nanmean(wmag.*sarea);
+      magprop = magprop./magprop(1);
+      wmag    = wmag+(mindiafluxL*magprop)./sarea;
+      clear mindiafluxL q;
+  end
     
-    wmag(find(isnan(wmag)))=1e-99;
+    wmag(find(isnan(wmag))) = 1e-99;
     
 
   % include error bar on a priori mixing
-  wmag=wmag+edrD_apDivA(2:nlayers,:,boxnum);
-  % allow mixing of heat, salt to be large enough to
-  % counter diapcynal advection (e.g. Niiler-Stevenson balance)
- % for propnum=2:nproperties;
-    %q=find(wmag(:,propnum)<wmag(:,1));
-    %wmag(q,propnum)=wmag(q,1);
-  %end;
+  wmag = wmag+edrD_apDivA(2:nlayers,:,boxnum);
 
   % assign wmag^2 to Rxx
-  for propnum=1:nproperties;
-    Rxx(indw(:,propnum,boxnum),indw(:,propnum,boxnum))= ...
-	  diag( wmag(:,propnum).^2 );
-  end;
- 
+  for propnum = 1:nproperties
+    Rxx(indw(:,propnum,boxnum),indw(:,propnum,boxnum)) = diag( wmag(:,propnum).^2 );
+  end
 
   % air-sea adjustment terms
   % heat
-  %tvals=interp1(glayers,eAirSea(:,3,boxnum), ...
-        %glevels,'linear').^2;
-  tvals=NaN*ones(size(glevels));
-  for ti=1:length(glevels);
-    tvals(ti)=max([eAirSea(ti,3,boxnum) ...
-	 eAirSea(ti+1,3,boxnum)].^2);
-  end;
-  q=find(tvals>0);q2=find(tvals==0);
-  tvals(q2)=.01*min(tvals(q));
-  Rxx(indF(:,1,boxnum),indF(:,1,boxnum))=diag( tvals );
+  tvals = NaN*ones(size(glevels));
+  for ti = 1:length(glevels)
+    tvals(ti) = max([eAirSea(ti,3,boxnum) eAirSea(ti+1,3,boxnum)].^2);
+  end
+  q = find(tvals>0);q2=find(tvals==0);
+  tvals(q2) = .01*min(tvals(q));
+  Rxx(indF(:,1,boxnum),indF(:,1,boxnum)) = diag( tvals );
 
   % freshwater
-  %tvals=interp1(glayers,eAirSea(:,1,boxnum), ...
-	%glevels,'linear').^2;
-  tvals=NaN*ones(size(glevels));
-  for ti=1:length(glevels);
-    tvals(ti)=max([eAirSea(ti,1,boxnum) ...
-         eAirSea(ti+1,1,boxnum)].^2);
-  end;
-  q=find(tvals>0);q2=find(tvals==0);
-  tvals(q2)=.01*min(tvals(q));
-  Rxx(indF(:,2,boxnum),indF(:,2,boxnum))=diag( tvals );
+  tvals = NaN*ones(size(glevels));
+  for ti = 1:length(glevels)
+    tvals(ti) = max([eAirSea(ti,1,boxnum) eAirSea(ti+1,1,boxnum)].^2);
+  end
+  q = find(tvals>0);q2=find(tvals==0);
+  tvals(q2) = .01*min(tvals(q));
+  Rxx(indF(:,2,boxnum),indF(:,2,boxnum)) = diag( tvals );
 
-end;	% looping over boxnum
+end	% looping over boxnum
 
 % a priori adjustments to net Ekman transport
 if (length(EkmanAdjust)==1)

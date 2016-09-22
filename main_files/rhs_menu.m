@@ -56,7 +56,7 @@ if isempty(DL)
    disp(' ')
    disp('WARNING: RHS not constructed, reflevel not set.')
    disp(' ')
-   disp('Hit a key to continue')
+   disp('Hit a key to continue and construct RHS')
    pause
 else
    D = -DL;
