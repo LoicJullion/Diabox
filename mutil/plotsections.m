@@ -1,4 +1,4 @@
-function plotsections(geometry,sectfiles)
+function plotsections(geometry)
 %==========================================================================
 % function plotsections(sm,cart)
 %
@@ -31,6 +31,7 @@ col='b';    % color
 
 sm=1;
 cart=1; 
+eval([geometry]);
 
 Lon=[];Lat=[];
 for i=1:size(geometry,2);

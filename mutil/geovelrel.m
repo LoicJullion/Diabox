@@ -1,4 +1,4 @@
-function gvel = geovelrel(vel, ref_rows, last_rows, sectfile)
+function gvel = geovelrel(vel, ref_rows, last_rows, sectfile, RV_opt)
 %======================================================================
 % GEOVELREL   1.6  92/11/20   Copyright (C) Phil Morgan 1992
 %
@@ -14,7 +14,10 @@ function gvel = geovelrel(vel, ref_rows, last_rows, sectfile)
 %                matrix(nbins,npairs)
 %    ref_rows  = row of "vel" at each pair to set as the 'reference level'.
 %    last_rows = optional row number for last valid velocity value to use.
-%                        (set to NaN by default)
+%                (set to NaN by default)
+%    RV_opt    = Choice for the reference velocities (1 = no velocity is
+%                added, 2 = velocities calculated in uniquerefvel.m and 
+%                stored in the refvel/ are used.
 % 
 % OUTPUT:
 %    gvel     = geostrophic velocity relative to the reference level.
@@ -69,8 +72,7 @@ end %if
 %disp('   2) Set Non-zero Reference velocity from *.mat file  ')
  
 %RV_opt = input([' Select a menu number:  ']);
-RV_opt=2;
-
+% Create file name
 file_RV=sectfile;
 q=find(file_RV=='/');
 file_RV(1:max(q))=[];
@@ -113,5 +115,4 @@ for icol=1:length(refvel)
 end %for
 return
 %==========================================================================
-return
 

@@ -75,7 +75,7 @@ end;
 colr=colr(1:size(geometry,1),:);
 
 hold on;
-plotsections(geometry,sectfiles);
+eval(['plotsections(''' file_geom ''')']);
 
 for i=1:size(geometry,2);	% loop through sections
     raw_filename = charword(sectfiles(i,:));
