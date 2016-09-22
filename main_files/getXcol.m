@@ -44,7 +44,10 @@ for propnum=1:nproperties;
         -A(indb(nlayers-1,propnum,boxnum), indw(nlayers-1,propnum,boxnum));
     end;
 end;
-% This could be fixed in Xcols.mat when I recalculate these terms
+% Note by Loic:
+% This could be fixed in Xcols.mat when I recalculate these terms but
+% indexes are pretty confusing and there are many other things to improve 
+% first. 
 %--------------------------------------------------------------------------
 
 disp('Conserved properties are hard-coded. ');
@@ -176,7 +179,7 @@ clear sectint EkM EkS EkH;
 
 % Identify which layers exist in each box using the bounding hydrography 
 % around each box and the interior air-sea forcing.
-defined_layers = zeros(length(glayers),nboxes);
+defined_layers = zeros(nlayers,nboxes);
 for boxnumber=1:nboxes;
   q=find(abs(geometry(boxnumber,:)));
   for i=1:length(q);

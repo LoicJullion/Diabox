@@ -26,7 +26,7 @@
 %                       the same or similar license to this one.
 %-----------------
 % AUTHORS:
-%    Loïc Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
+%    Lo?c Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
 %    and the many collaborators who helped me improve my understanding of
 %    inverse modelling.
 %
@@ -161,8 +161,11 @@ while box_menu_stop == 0
 
     % row_beg: First row for each box
     % row_end: Last row for each box
-    % col_beg: First col for each ctd section + each Xcol term
-    % col_end: Last col for each ctd section + each Xcol term;
+    % col_beg: First col for each ctd section 
+    % col_end: Last col for each ctd section
+    % The last term of col_beg and col_end mark the beginning and end of
+    % the extra terms (for example, 3 boxes with 3 layer interface will
+    % give 27 extra columns (3 layers * 3 properties * 3 boxes)
     [row_beg,row_end,col_beg,col_end] = ...
           set_xindex(Xrows,Xcols,row_beg,row_end, ...
                      col_beg,col_end,nboxes,nsections);

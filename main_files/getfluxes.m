@@ -73,7 +73,10 @@ else   %   1<=reflevel<=maxlevels
 end %if
 
 % Calculate geostrophic velocity
-gvel = geovelrel(vel,ref_bin,com_rows,sectfile);
+RV_opt = 2; % RV_opt = 1: No extra reference velocities is added.
+            % RV_opt = 2: Extra reference velocities stored in refvel/ are
+            % added
+gvel = geovelrel(vel,ref_bin,com_rows,sectfile,RV_opt);
 
 % save gvel to file
 load dir_loc.mat gvel_dir

@@ -105,17 +105,20 @@ clear Vmag sectt;
 %% Load extra variables (air-sea fluxes, Ekman...)
 % In the first part of DIABOX, the diapycnal fluxes have already been
 % included.
+addXterm = 0;
+if addXterm == 1
+    % 1) First load the new terms that have been previously calculated in 
+    % makeairsea.m 
+    getXcol;
 
-% 1) First load the new terms that have been previously calculated in 
-% makeairsea.m 
-getXcol;
+    % 2) Now we add the new terms loaded in 1) to the terms of the inversion. 
+    updateA_b;
 
-% 2) Now we add the new terms loaded in 1) to the terms of the inversion. 
-updateA_b;
-
-% !!!!!! NOTE THAT THESE 2 MFILES NEED TO BE UPDATED IN ONE WISHES TO ADD 
-% NEW TERMS. !!!!!
-
+    % !!!!!! NOTE THAT THESE 2 MFILES NEED TO BE UPDATED IN ONE WISHES TO ADD 
+    % NEW TERMS. !!!!!
+else
+    disp('No new extra unkowns have been added. Inversion is only using diapycnal fluxes');
+end
 %% Add uncertainties
 % !!!!!! NOTE THAT THIS MFILE NEEDS TO BE UPDATED ACCORDING TO THE WEIGHTS
 % THE USER WISHES TO ADD TO THE DIFFERENT TERMS OF THE INVERSION.
@@ -123,8 +126,12 @@ updateA_b;
 % the relative importance of the different terms of the inverse model.
 addWeights;
 %% Add extrat constraints 
-add_xconstraints;
-
+xconst = 0;
+if xconst == 1
+    add_xconstraints;
+else
+    disp('No extra constraints have been added')
+end
 %% Solve the system via Gauss-Markov estimation 
 disp('Solving the set of equations.');
 fprintf('  Inverting ... ');
