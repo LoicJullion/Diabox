@@ -8,7 +8,7 @@ function create_new_inversion(dirname)
 % (PIs R. Lumpkin and K. Speer, Florida State University). 
 % Current development is handled by Rick Lumpkin 
 % (Cooperative Institute for Marine and Atmospheric Sciences, Univ. Miami) 
-% and Loïc Jullion (FSU, now at MIO in France). 
+% and Lo?c Jullion (FSU, now at MIO in France). 
 % DIABOX adds explicit air-sea transformation for outcropping layers, 
 % includes greater automation than in DOBOX for often-repeated steps, 
 % collects global choices for hydrographic sections into a single file, 
@@ -54,7 +54,7 @@ function create_new_inversion(dirname)
 %                       the same or similar license to this one.
 %-----------------
 % Authors:
-%    Loïc Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
+%    Lo?c Jullion (FSU/MIO). Strongly inspired by Kevin Speer, Rick Lumpkin
 %    and the many collaborators who helped me improve my understanding of
 %    inverse modelling.
 %
@@ -92,10 +92,10 @@ diapvel_dir  = ['diapvel/']; % Output from the inversion
 boxcoord_dir = ['boxcoord/']; % Coordinates of polygons along box's rim
 xconst_dir   = ['xconstraints/']; % Extra constraints
 
-riverdir     = '~/Work/Diabox_v2.0_beta/Anc_data/Riverflow/'; % Path to the river flow data
-climdir      = '~/Work/Diabox_v2.0_beta/Anc_data/Ocean_clim/'; % Path to ocean reanalysis used to calculate SSS
-clim_asdir   = '~/Work/Diabox_v2.0_beta/Anc_data/ERA/'; % Path to climate reanalysis used to calculate air-sea fluxes
-bathy_dir    = '~/Work/Diabox_v2.0_beta/Anc_data/bathy/';
+riverdir     = '~/Work/DIABOX_v2.0_beta/Anc_data/Riverflow/'; % Path to the river flow data
+climdir      = '~/Work/DIABOX_v2.0_beta/Anc_data/Ocean_clim/'; % Path to ocean reanalysis used to calculate SSS
+clim_asdir   = '~/Work/DIABOX_v2.0_beta/Anc_data/ERA/'; % Path to climate reanalysis used to calculate air-sea fluxes
+bathy_dir    = '~/Work/DIABOX_v2.0_beta/Anc_data/bathy/';
 
 % Copy files which will contain inversion specific parameters.
 % Geometry file
