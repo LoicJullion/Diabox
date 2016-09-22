@@ -58,9 +58,7 @@ if strcmp(climato,'WGHC')==1
        % Neutral density. Already calculated in read_wghc
        
     else
-       % To be modified depending on which density is being used
-       
-       
+       % To be modified depending on which density is being used 
        temp1 = reshape(temp,length(lat_clim)*length(lon_clim),size(temp,3));
        sal1 = reshape(sal,length(lat_clim)*length(lon_clim),size(temp,3));
        press1 = reshape(press,length(lat_clim)*length(lon_clim),size(temp,3));
@@ -143,7 +141,7 @@ for boxnumber=1:nboxes;
     % load lon, lat polygon defining box
     eval(['load ' boxcoord_dir 'boxcoords' num2str(boxnumber)]);
 
-    % Calculate the area of the box 
+    % Calculate the area_layer of the box 
     % calculate distance and angle between consecutive stations in the box
      [dist,phaseangle] = sw_dist(lat,lon,'km');
 
@@ -158,7 +156,7 @@ for boxnumber=1:nboxes;
      cumx = [0 cumsum(x)];
      cumy = [0 cumsum(y)];
 
-    % calculate the area of the box in km^2
+    % calculate the area_layer of the box in km^2
      total_area = polyarea(cumx,cumy);
 
     % convert to m^2
@@ -188,9 +186,9 @@ for boxnumber=1:nboxes;
     %--------------------------------
     % calculate areal averages of properties
     % Assign memory
-    area    = NaN*ones(size(glevels)); % area of each layer
-    msalt   = area;   mptemp = area;   mpres = area; % mean property
-    stdsalt = area; stdptemp = area; stdpres = area; % stand. dev.
+    area_layer    = NaN*ones(size(glevels)); % area_layer of each layer
+    msalt   = area_layer;   mptemp = area_layer;   mpres = area_layer; % mean property
+    stdsalt = area_layer; stdptemp = area_layer; stdpres = area_layer; % stand. dev.
     layer_width = NaN*ones(length(glevels)+1,1);
     disp('Calculating layer mean values.');
     for ilayer=1:length(glevels);
@@ -231,7 +229,7 @@ for boxnumber=1:nboxes;
 
         % Now calculate dx for the points within the box that contain the layer                                        
         dx     = 0.5*pi/180*re*cos(latmat_clim(box_point(layer_point))*pi/180);
-        area(ilayer) = sum(abs(dx.*dy)); % Calculate the area of the layer 
+        area_layer(ilayer) = sum(abs(dx.*dy)); % Calculate the area_layer of the layer 
                                            % within the box (m^2).
 
         % Now calculate the averaged temperature and salinity for the layers
@@ -245,9 +243,9 @@ for boxnumber=1:nboxes;
         stdsalt(ilayer)  = nanstd(salmap(layer_point));
         stdpres(ilayer)  = nanstd(pressmap(layer_point));
 
-        % normalise so that maximum area within box does not exceed total area
-        if max(area(ilayer))>total_area
-           area(ilayer)=area(ilayer)*total_area/max(area);
+        % normalise so that maximum area_layer within box does not exceed total area_layer
+        if max(area_layer(ilayer))>total_area
+           area_layer(ilayer)=area_layer(ilayer)*total_area/max(area_layer);
         end
 
       if (ilayer==1)
@@ -258,7 +256,7 @@ for boxnumber=1:nboxes;
       layer_width(ilayer)=nanmean(lwidth(find(lwidth>0)));
      %  
     end
-    eval(['save ' diapvel_dir 'mprop_diap' num2str(boxnumber) '.mat mptemp msalt mpres stdsalt stdptemp stdpres layer_width area total_area ']);
+    eval(['save ' diapvel_dir 'mprop_diap' num2str(boxnumber) '.mat mptemp msalt mpres stdsalt stdptemp stdpres layer_width area_layer total_area ']);
 
 end
 

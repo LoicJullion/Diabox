@@ -32,7 +32,7 @@
 %
 %==========================================================================
 % Recreate a landmask based on the vectorized data. Good test to see if
-% your indeces and your data correspond.
+% your indices and your data correspond.
 landmask=NaN*ones(length(lat_coads),length(lon_coads));
 landmask(index)=mean(sst,1);
 landmask=isnan(landmask);
@@ -43,22 +43,67 @@ landmask=isnan(landmask);
 % pcolor(double(landmask)); shading flat
 % close
 
-% Get data points outside the box
-q = find(lonvec>max(lon)+max(abs(diff(lon_coads))) | ...
-	lonvec<min(lon)-max(abs(diff(lon_coads))) | ...
-	latvec> max(-50, ...
-        max(lat)+max(abs(diff(lat_coads)))) | ...
-	latvec<min(lat)-max(abs(diff(lat_coads))));
 
-% Get rid of the points outside the box
-lonvec(q)    = [];
-latvec(q)    = [];
-eminusp(:,q) = [];
-netheat(:,q) = [];
-sst(:,q)     = [];
-sss(:,q)     = [];
-taux(:,q)    = [];
-tauy(:,q)    = [];
+% % Get data points outside the box
+% q = find(lonvec>max(lon)+max(abs(diff(lon_coads))) | ...
+% 	lonvec<min(lon)-max(abs(diff(lon_coads))) | ...
+% 	latvec> max(-50, ...
+%         max(lat)+max(abs(diff(lat_coads)))) | ...
+% 	latvec<min(lat)-max(abs(diff(lat_coads))));
+% 
+% % Get rid of the points outside the box
+% lonvec(q)    = [];
+% latvec(q)    = [];
+% eminusp(:,q) = [];
+% netheat(:,q) = [];
+% sst(:,q)     = [];
+% sss(:,q)     = [];
+% taux(:,q)    = [];
+% tauy(:,q)    = [];
+
+% Plot climatology
+if(1) % Switch to one if you want to use.
+    sss2=NaN*ones(length(lat_coads),length(lon_coads));
+    sss2(index)=squeeze(netheat(1,:));
+    figure;
+    hold on;
+    pcolor(lon_coads,lat_coads,sss2);
+    colormap(parula);
+    shading flat;
+    caxis([min(min(sss2)) max(max(sss2))])
+end
+
+
+% IT SEEMS THAT THE CODE ISOLATE THE EQUATORIAL PACIFIC RATHER THAN THE
+% TYRRHENIAN SEA???
+q = ~isinpoly(lonvec,latvec,lon,lat);
+
+if (1)
+    netheat(:,q)    = NaN;
+    sss(:,q)    = NaN;
+    index(:,q)  = NaN;
+
+    sss2=NaN*ones(length(lat_coads),length(lon_coads));
+    sss2(index)=squeeze(sss(1,:));
+    figure
+    hold on;
+    pcolor(lon_coads,lat_coads,sss2);
+    colormap(parula);
+    shading flat
+    caxis([min(min(sss2)) max(max(sss2))])
+end
+netheat(:,q)    = [];
+eminusp(:,q)    = [];
+sss(:,q)        = [];
+sst(:,q)        = [];
+taux_inbox      = taux;
+tauy_inbox      = tauy;
+taux_inbox(:,q) = [];
+tauy_inbox(:,q) = [];
+
+index(q)  = [];
+lonvec(q) = [];
+latvec(q) = [];
 
 % Isolate the lat and long and landmask
 q = find(lon_coads<min(lonvec) | lon_coads>max(lonvec));
@@ -69,19 +114,32 @@ q = find(lat_coads<min(latvec) | lat_coads>max(latvec));
 landmask(q,:) = [];
 lat_coads(q)  = [];
 
-% Recreate the index corresponding to the truncated matrix 
-index = NaN*ones(length(latvec),2);
-for n=1:length(lat_coads);
-  q=find(latvec==lat_coads(n));
-  index(q,1)=n;
-end;
-for n=1:length(lon_coads);
-  q=find(lonvec==lon_coads(n));
-  index(q,2)=n;
-end;
-%rindex=index';
-index=(index(:,2)-1)*max(index(:,1)) + index(:,1);
-index=index';
-Latmat=lat_coads*ones(1,length(lon_coads));
-Lonmat=ones(length(lat_coads),1)*lon_coads';
+% % Recreate the index corresponding to the truncated matrix 
+% index = NaN*ones(length(latvec),2);
+% for n=1:length(lat_coads);
+%   q=find(latvec==lat_coads(n));
+%   index(q,1)=n;
+% end
+% 
+% for n=1:length(lon_coads);
+%   q=find(lonvec==lon_coads(n));
+%   index(q,2)=n;
+% end
+% 
+% %rindex=index';
+% index=(index(:,2)-1)*max(index(:,1)) + index(:,1);
+% index=index';
+% Latmat=lat_coads*ones(1,length(lon_coads));
+% Lonmat=ones(length(lat_coads),1)*lon_coads';
 
+% Good to check that you have the data in the right box
+if(1) % Switch to one if you want to use.
+    sss2=NaN*ones(length(lat_coads),length(lon_coads));
+    sss2(index)=squeeze(sss(1,:));
+    plotsections('geo');
+    freezeColors;
+    hold on;
+    pcolor(lon_coads,lat_coads,sss2);
+    colormap(parula)
+    caxis([min(min(sss2)) max(max(sss2))])
+end

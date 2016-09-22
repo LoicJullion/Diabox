@@ -65,7 +65,8 @@
 %-----------------
 %
 %==========================================================================
-clear all;clc;
+clear all;
+clc;
 
 % input the years from the UWM/COADS flux fields
 % to apply to the inverse model.
@@ -122,15 +123,7 @@ end;
 %% Remove data outside box using the polygons created for each box (makeboxcoord.m).
 eval(['load ' boxcoord_dir 'boxcoords',num2str(boxnumber)]);
 truncatereanal;
-q=~isinpoly(lonvec,latvec,lon,lat);
-netheat(:,q)    = NaN;
-eminusp(:,q)    = NaN;
-sss(:,q)        = NaN;
-sst(:,q)        = NaN;
-taux_inbox      = taux;
-tauy_inbox      = tauy;
-taux_inbox(:,q) = NaN;
-tauy_inbox(:,q) = NaN;
+
 %% Load river run off data.
 eval(['load ',riverdir,'river_runoff.mat;']);
 
@@ -196,15 +189,15 @@ if ~flag_h netheat  = zeros(size(netheat)); end;
 clear lon lat
 %% Plot sea surface salinity field. 
 % Good to check that you have the data in the right box
-if(0) % Switch to one if you want to use.
+if(1) % Switch to one if you want to use.
     sss2=NaN*ones(length(lat_coads),length(lon_coads));
-    sss2(index)=mean(sss,1);
-    plotsections;
+    sss2(index)=squeeze(sss(1,:));
+    plotsections('geo');
     freezeColors;
     hold on;
     pcolor(lon_coads,lat_coads,sss2);
     plot(lon_river,lat_river,'*b');
-    colormap(jet)
+    colormap(parula)
     caxis([min(min(sss2)) max(max(sss2))])
 end
 % pause(.1);
@@ -218,6 +211,8 @@ end
 % 2. 1e-8 m/s E-P over error_corrdist^2
 
 %% Calculate density, salt, heat fluxes 
+nummonths = size(taux_inbox,1); % number of months
+dens_choice = 'pden'; % 'gamma' for neutral density
 calcflux;
 
 % calculate matrix of area (m^2) for pixels
